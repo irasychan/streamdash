@@ -1,5 +1,23 @@
 # Current Work Log
 
+## Recently Completed
+
+### Follower Goal Widget Fix
+**Date:** 2026-01-24
+**Status:** Complete
+
+Fixed the follower goal widget to display real follower counts instead of hardcoded demo data.
+
+**Changes:**
+- Updated `/api/twitch` route to return actual `followers` count in `goal.current`
+- Load user config to use configured `followerTarget` for `goal.target`
+- Widget now reflects real-time follower progress toward user-defined goals
+
+**Files Modified:**
+- `app/api/twitch/route.ts`
+
+---
+
 ## Active Tasks
 
 ### Widget Preview in Dashboard

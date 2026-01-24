@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { demoStats } from "@/lib/demoData";
+import { loadConfig } from "@/lib/config/configStore";
 
 type TwitchToken = {
   accessToken: string;
@@ -90,6 +91,10 @@ export async function GET(request: Request) {
       }
     }
 
+    // Load user config to get the follower goal target
+    const config = await loadConfig();
+    const followerTarget = config.goals.followerTarget;
+
     const response = NextResponse.json({
       ok: true,
       data: {
@@ -98,7 +103,10 @@ export async function GET(request: Request) {
         viewers,
         followers,
         subs: demoStats.subs,
-        goal: demoStats.goal,
+        goal: {
+          current: followers,
+          target: followerTarget,
+        },
       },
     });
 
