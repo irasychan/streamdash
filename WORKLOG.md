@@ -50,6 +50,31 @@ Fixed the follower goal widget to display real follower counts instead of hardco
 
 ## Active Tasks
 
+### State Management Refactor
+**Priority:** Medium
+**Status:** Pending
+
+Reduce context provider nesting by consolidating state management.
+
+**Current Issues:**
+- Multiple nested providers in layout (ChatStatusContext, EmoteProvider, etc.)
+- Each context has its own fetch/polling logic
+- Provider pyramid in `app/dashboard/layout.tsx`
+
+**Options to Consider:**
+- [ ] Zustand: lightweight, no providers needed, works with SSR
+- [ ] Jotai: atomic state, minimal boilerplate
+- [ ] Consolidate into single AppContext with selectors
+
+**Subtasks:**
+- [ ] Audit current context providers and their dependencies
+- [ ] Choose state management approach
+- [ ] Migrate chat status state
+- [ ] Migrate emote state
+- [ ] Migrate preferences state
+- [ ] Remove provider nesting from layouts
+- [ ] Test SSR compatibility
+
 ### Widget Preview in Dashboard
 **Priority:** Medium
 **Status:** Pending
