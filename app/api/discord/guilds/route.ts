@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { Guild } from "@/lib/discord/auth";
+import type { Guild } from "@/services/discord/auth";
 
 export async function GET() {
   const cookieStore = await cookies();

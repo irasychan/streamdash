@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,33 +17,54 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { useConfig } from "@/hooks/useConfig";
-import { usePreferences } from "@/hooks/usePreferences";
+import { useConfig } from "@/features/config/useConfig";
+import { usePreferences } from "@/features/preferences/usePreferences";
 import { DiscordChannelPicker } from "@/components/DiscordChannelPicker";
-import type { FontSize, MessageDensity, ThemePreset } from "@/lib/types/preferences";
-import { THEME_PRESETS } from "@/lib/types/preferences";
+import type { FontSize, MessageDensity, ThemePreset } from "@/features/preferences/types";
+import { THEME_PRESETS } from "@/features/preferences/types";
 
-export default function SettingsPage() {
-  const { config, loading, saving, error, update, reset } = useConfig();
-  const { preferences, update: updatePreferences, reset: resetPreferences } = usePreferences();
+type ConfigHook = ReturnType<typeof useConfig>;
+type PreferencesHook = ReturnType<typeof usePreferences>;
 
-  // Local state for form inputs (synced with config)
-  const [twitchChannel, setTwitchChannel] = useState("");
-  const [youtubeChannelId, setYoutubeChannelId] = useState("");
-  const [youtubeLiveChatId, setYoutubeLiveChatId] = useState("");
-  const [discordChannelId, setDiscordChannelId] = useState("");
-  const [followerTarget, setFollowerTarget] = useState("");
+type SettingsFormProps = {
+  config: ConfigHook["config"];
+  loading: ConfigHook["loading"];
+  saving: ConfigHook["saving"];
+  error: ConfigHook["error"];
+  update: ConfigHook["update"];
+  reset: ConfigHook["reset"];
+  preferences: PreferencesHook["preferences"];
+  updatePreferences: PreferencesHook["update"];
+  resetPreferences: PreferencesHook["reset"];
+};
 
-  // Sync local state with loaded config
-  useEffect(() => {
-    if (!loading) {
-      setTwitchChannel(config.platforms.twitch.defaultChannel);
-      setYoutubeChannelId(config.platforms.youtube.defaultChannelId);
-      setYoutubeLiveChatId(config.platforms.youtube.defaultLiveChatId);
-      setDiscordChannelId(config.platforms.discord.defaultChannelId);
-      setFollowerTarget(config.goals.followerTarget.toString());
-    }
-  }, [config, loading]);
+function SettingsForm({
+  config,
+  loading,
+  saving,
+  error,
+  update,
+  reset,
+  preferences,
+  updatePreferences,
+  resetPreferences,
+}: SettingsFormProps) {
+  // Local state for form inputs (initialized from config)
+  const [twitchChannel, setTwitchChannel] = useState(
+    () => config.platforms.twitch.defaultChannel
+  );
+  const [youtubeChannelId, setYoutubeChannelId] = useState(
+    () => config.platforms.youtube.defaultChannelId
+  );
+  const [youtubeLiveChatId, setYoutubeLiveChatId] = useState(
+    () => config.platforms.youtube.defaultLiveChatId
+  );
+  const [discordChannelId, setDiscordChannelId] = useState(
+    () => config.platforms.discord.defaultChannelId
+  );
+  const [followerTarget, setFollowerTarget] = useState(
+    () => config.goals.followerTarget.toString()
+  );
 
   const handleSave = async () => {
     await update({
@@ -512,5 +533,33 @@ DISCORD_BOT_TOKEN=`}
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  const { config, loading, saving, error, update, reset } = useConfig();
+  const { preferences, update: updatePreferences, reset: resetPreferences } = usePreferences();
+
+  const formKey = [
+    config.platforms.twitch.defaultChannel,
+    config.platforms.youtube.defaultChannelId,
+    config.platforms.youtube.defaultLiveChatId,
+    config.platforms.discord.defaultChannelId,
+    config.goals.followerTarget,
+  ].join("|");
+
+  return (
+    <SettingsForm
+      key={formKey}
+      config={config}
+      loading={loading}
+      saving={saving}
+      error={error}
+      update={update}
+      reset={reset}
+      preferences={preferences}
+      updatePreferences={updatePreferences}
+      resetPreferences={resetPreferences}
+    />
   );
 }

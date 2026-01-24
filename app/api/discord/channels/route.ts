@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CHANNEL_TYPES, type Channel } from "@/lib/discord/auth";
+import { CHANNEL_TYPES, type Channel } from "@/services/discord/auth";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChatContainer } from "@/components/chat";
+import { ChatContainer } from "@/features/chat/components";
 
 export default function ChatPage() {
   return (

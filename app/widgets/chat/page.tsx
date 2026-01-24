@@ -4,10 +4,10 @@ import { Suspense, useEffect, useMemo, useRef, useState, useCallback } from "rea
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
-import { EmoteProvider, useEmotes } from "@/hooks/useEmotes";
-import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/lib/types/chat";
+import { useEmotes } from "@/features/emotes/hooks/useEmotes";
+import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/features/chat/types/chat";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
@@ -200,12 +200,10 @@ function ChatWidgetSkeleton() {
 
 export default function ChatWidget() {
   return (
-    <EmoteProvider>
-      <main className="p-4 min-h-screen">
-        <Suspense fallback={<ChatWidgetSkeleton />}>
-          <ChatWidgetContent />
-        </Suspense>
-      </main>
-    </EmoteProvider>
+    <main className="p-4 min-h-screen">
+      <Suspense fallback={<ChatWidgetSkeleton />}>
+        <ChatWidgetContent />
+      </Suspense>
+    </main>
   );
 }

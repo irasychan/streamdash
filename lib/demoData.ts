@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@/lib/types/chat";
+import type { ChatMessage } from "@/features/chat/types/chat";
 
 export const demoStats = {
   channel: "iroiroira",

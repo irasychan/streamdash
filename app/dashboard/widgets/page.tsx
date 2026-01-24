@@ -4,16 +4,15 @@ import { useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, MessageSquare, Eye, Save, Loader2 } from "lucide-react";
-import { useConfig } from "@/hooks/useConfig";
-import { WidgetConfigCard } from "@/components/widgets/WidgetConfigCard";
-import { ChatWidgetConfigForm } from "@/components/widgets/ChatWidgetConfigForm";
-import { generateChatWidgetUrl, generateGoalWidgetUrl, generateStatsWidgetUrl } from "@/lib/widgets/urlGenerator";
+import { useConfig } from "@/features/config/useConfig";
+import { WidgetConfigCard, ChatWidgetConfigForm } from "@/features/widgets/components";
+import { generateChatWidgetUrl, generateGoalWidgetUrl, generateStatsWidgetUrl } from "@/services/widgets/urlGenerator";
 import {
   DEFAULT_CHAT_WIDGET_CONFIG,
   DEFAULT_GOAL_WIDGET_CONFIG,
   DEFAULT_STATS_WIDGET_CONFIG,
-} from "@/lib/types/config";
-import type { ChatWidgetConfig, GoalWidgetConfig, StatsWidgetConfig } from "@/lib/types/config";
+} from "@/features/config/types";
+import type { ChatWidgetConfig, GoalWidgetConfig, StatsWidgetConfig } from "@/features/config/types";
 
 export default function WidgetsPage() {
   const { config, loading, saving, update } = useConfig();

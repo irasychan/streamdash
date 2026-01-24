@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectionManager, saveYouTubeToken } from "@/lib/chat";
+import { connectionManager } from "@/services/chat/ConnectionManager";
+import { saveYouTubeToken } from "@/features/chat/utils/youtubeTokenStore";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
