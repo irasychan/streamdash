@@ -1,138 +1,220 @@
 # AGENTS.md
 
-This repository is a Next.js (App Router) project for a streaming dashboard
-and OBS-ready widgets. Follow the conventions below when adding features.
+Next.js 16 (App Router) streaming dashboard with OBS widgets and multi-platform
+chat aggregation (Twitch, YouTube, Discord). TypeScript + Tailwind + shadcn/ui.
 
-## Quick Discovery Checklist
+## Quick Reference
 
-- Project manifest: `package.json` (Next.js + TypeScript).
-- Lint config: `.eslintrc.json` (Next Core Web Vitals).
-- Entrypoints: `app/` (App Router), `app/api/` for routes.
-- Shared UI: `components/`, data helpers in `lib/`.
-- No test runner configured yet.
+| Item | Location |
+|------|----------|
+| Package manifest | `package.json` |
+| TypeScript config | `tsconfig.json` (strict mode enabled) |
+| ESLint config | `eslint.config.mjs` (Next.js defaults) |
+| Tailwind config | `tailwind.config.ts` |
+| shadcn/ui config | `components.json` |
+| Global styles | `app/globals.css` |
 
-## Commands (Build/Lint/Test)
+## Commands
 
-- Install deps: `npm install`
-- Dev server: `npm run dev`
-- Build: `npm run build`
-- Start production: `npm run start`
-- Lint: `npm run lint`
-- Tests: none configured yet (add and document when present).
+```bash
+npm install          # Install dependencies
+npm run dev          # Start dev server (http://localhost:3000)
+npm run build        # Production build
+npm run start        # Run production server
+npm run lint         # Run ESLint
+```
 
-### Running a Single Test (when a runner is added)
+### Testing (not yet configured)
 
-- Jest: `npm test -- path/to/file.test.ts` or `npm test -- -t "name"`
-- Vitest: `npx vitest path/to/file.test.ts` or `npx vitest -t "name"`
+No test runner is configured. When adding tests:
 
-## Code Style Guidelines
+```bash
+# Jest
+npm test -- path/to/file.test.ts
+npm test -- -t "test name pattern"
 
-Follow the existing Next.js + TypeScript patterns in `app/` and `components/`.
+# Vitest
+npx vitest path/to/file.test.ts
+npx vitest -t "test name pattern"
+```
 
-### General
+## Project Structure
 
-- Respect existing patterns before introducing new ones.
-- Prefer small, composable functions; avoid large monoliths.
-- Keep public APIs stable; avoid breaking changes without migration notes.
-- Add comments only for non-obvious logic or tricky constraints.
+```
+app/
+├── layout.tsx              # Root layout with fonts
+├── page.tsx                # Landing page
+├── globals.css             # CSS variables and utilities
+├── dashboard/
+│   ├── layout.tsx          # Dashboard shell with sidebar
+│   └── page.tsx            # Main dashboard view
+├── widgets/*/page.tsx      # OBS browser source widgets
+└── api/
+    ├── twitch/             # Twitch Helix proxy + OAuth
+    ├── youtube/            # YouTube Data API proxy + OAuth
+    ├── discord/            # Discord OAuth + guild/channel APIs
+    └── chat/               # Chat SSE stream + connect/disconnect
 
-### Formatting
+components/
+├── ui/                     # shadcn/ui primitives
+├── chat/                   # Chat-specific components
+└── *.tsx                   # Shared components
 
-- Use spaces, not tabs.
-- Wrap lines at 100–120 chars when possible.
-- Keep imports grouped and sorted; no unused imports.
-- Prefer CSS classes in `app/globals.css`; inline style only for layout tweaks.
+lib/
+├── utils.ts                # cn() helper for Tailwind classes
+├── types/                  # Shared TypeScript types
+├── chat/                   # Chat bridge implementations
+└── discord/                # Discord auth helpers
+
+hooks/                      # React hooks
+```
+
+## Code Style
+
+### TypeScript
+
+- **Strict mode** is enabled (`tsconfig.json`)
+- Avoid `any`; use `unknown` and narrow types when needed
+- Define explicit types for API responses and shared data
+- Use `type` for object shapes, `interface` for extendable contracts
+- Use literal unions for known value sets: `type Platform = "twitch" | "youtube"`
+
+```typescript
+// Good: explicit API response type
+type TokenResponse = {
+  access_token: string;
+  expires_in: number;
+};
+
+// Good: literal union
+type ChatPlatform = "twitch" | "youtube" | "discord";
+```
 
 ### Imports
 
-- Use the `@/*` alias for absolute imports.
-- Group imports: React/Next, third-party, local modules.
-- Avoid circular dependencies; refactor if discovered.
+- Use `@/*` path alias for all imports (configured in tsconfig)
+- Group imports: React/Next → third-party → local modules
+- No unused imports (ESLint will flag these)
 
-### Naming
+```typescript
+import { NextResponse } from "next/server";         // Next.js
+import { cookies } from "next/headers";
 
-- Use `camelCase` for variables/functions in JS/TS.
-- Use `PascalCase` for classes/components/types.
-- Use `UPPER_SNAKE_CASE` for constants if the language expects it.
-- Use clear, specific names; avoid single-letter identifiers.
+import { cn } from "@/lib/utils";                   // Local
+import type { ChatMessage } from "@/lib/types/chat";
+```
 
-### Types
+### Naming Conventions
 
-- Prefer explicit types for API payloads and shared data.
-- Avoid `any`; document why if needed.
-- Use literal unions for known value sets.
+| Type | Convention | Example |
+|------|------------|---------|
+| Variables/functions | camelCase | `fetchChatStatus`, `isConnected` |
+| Components | PascalCase | `ChatContainer`, `PlatformBadge` |
+| Types/Interfaces | PascalCase | `ChatMessage`, `TokenResponse` |
+| Constants | UPPER_SNAKE_CASE | `CHANNEL_TYPES`, `API_BASE_URL` |
+| Files (components) | PascalCase | `ChatMessage.tsx` |
+| Files (utilities) | camelCase | `demoData.ts` |
+| API routes | kebab-case dirs | `app/api/chat/connect/route.ts` |
+
+### Components
+
+- Use function components with explicit return types when complex
+- Prefer `"use client"` only when browser APIs are needed
+- Keep components small; extract logic into hooks or utilities
+- Use `cn()` from `@/lib/utils` for conditional Tailwind classes
+
+```typescript
+"use client";
+
+import { cn } from "@/lib/utils";
+
+type Props = { active?: boolean; className?: string };
+
+export function StatusDot({ active, className }: Props) {
+  return (
+    <span className={cn(
+      "h-2 w-2 rounded-full",
+      active ? "bg-emerald-500" : "bg-muted-foreground/50",
+      className
+    )} />
+  );
+}
+```
+
+### API Routes
+
+- All routes in `app/api/*/route.ts`
+- Return consistent JSON shape: `{ ok: boolean, data?, error? }`
+- Validate inputs before external API calls
+- Use `NextResponse.json()` for responses
+
+```typescript
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const param = url.searchParams.get("required");
+
+  if (!param) {
+    return NextResponse.json({ ok: false, error: "Missing parameter" });
+  }
+
+  return NextResponse.json({ ok: true, data: { /* ... */ } });
+}
+```
+
+### Styling
+
+- Use Tailwind utility classes; avoid inline styles except for dynamic values
+- Color tokens defined as CSS variables in `app/globals.css`
+- Use shadcn/ui theme colors: `bg-background`, `text-foreground`, `border-border`
+- Custom neon colors available: `--neon-pink`, `--neon-cyan`, `--neon-violet`
 
 ### Error Handling
 
-- Validate inputs in API routes; return structured errors.
-- Surface errors in UI with fallbacks (demo data is acceptable).
-- Log server errors with context (request + upstream response).
-
-### Testing
-
-- No test runner yet; add Jest or Vitest as needed.
-- Favor unit tests for data helpers and API utilities once added.
-
-### Frontend Defaults
-
-- Use semantic HTML with accessible labels.
-- Keep components small; prefer composition over inheritance.
-- Keep visual tokens in CSS variables; avoid new inline colors.
-
-### Backend Defaults
-
-- API routes live in `app/api/*/route.ts`.
-- Keep network fetch logic in API routes, not client components.
-- Validate query params before calling upstream APIs.
-
-## Repo-Specific Rules
-
-- No `.cursor/rules/` or `.cursorrules` detected.
-- No `.github/copilot-instructions.md` detected.
-- If these appear later, merge their guidance here.
-
-## Git Hygiene
-
-- Do not commit secrets, credentials, or `.env` files.
-- Keep commits focused; group related changes together.
-- Update this file if new tooling or style standards are added.
-
-## File Structure
-
-- `app/layout.tsx`: root layout and fonts.
-- `app/page.tsx`: landing page with links.
-- `app/dashboard/page.tsx`: main dashboard.
-- `app/widgets/*/page.tsx`: OBS browser widgets.
-- `app/api/twitch/route.ts`: Twitch Helix proxy.
-- `app/api/youtube/route.ts`: YouTube Data API proxy.
-- `components/`: shared UI building blocks.
-- `lib/demoData.ts`: demo stats fallback.
+- API routes: return `{ ok: false, error: "message" }` with appropriate status
+- Components: use fallback UI or demo data when APIs fail
+- Catch blocks: use empty catch `catch { }` or `catch (error)` with logging
 
 ## Environment Variables
 
-- `TWITCH_CLIENT_ID`: Twitch app client id.
-- `TWITCH_CLIENT_SECRET`: Twitch app client secret.
-- `TWITCH_APP_ACCESS_TOKEN`: Optional Twitch app access token (client credentials flow will auto-fetch if missing).
-- `YOUTUBE_API_KEY`: YouTube Data API key.
-- `YOUTUBE_CLIENT_ID`: YouTube OAuth client id.
-- `YOUTUBE_CLIENT_SECRET`: YouTube OAuth client secret.
-- `DISCORD_CLIENT_ID`: Discord OAuth client id.
-- `DISCORD_CLIENT_SECRET`: Discord OAuth client secret.
+```bash
+# Twitch
+TWITCH_CLIENT_ID=
+TWITCH_CLIENT_SECRET=
+TWITCH_APP_ACCESS_TOKEN=      # Optional, auto-fetched if missing
 
-## Recommended Defaults for New Code
+# YouTube
+YOUTUBE_API_KEY=
+YOUTUBE_CLIENT_ID=
+YOUTUBE_CLIENT_SECRET=
 
-- Keep everything in TypeScript.
-- Prefer server components unless browser-only behavior is needed.
-- If adding tests, document single-test commands here.
+# Discord
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_BOT_TOKEN=            # Required for chat (needs MESSAGE_CONTENT intent)
+```
 
-## When Updating This File
+## Git Practices
 
-- Add the exact single-test invocation syntax used in CI.
-- Capture any formatting rules (Prettier, etc.).
-- Record any strict typing rules (tsconfig, eslint rules).
-- Note new directory conventions and module boundaries.
+- Never commit `.env`, `.env.local`, or files in `.data/`
+- Keep commits focused on single features or fixes
+- Run `npm run build` before pushing to catch type errors
 
-## Contact
+## Adding New Features
 
-If you add new tooling or conventions, update this file immediately so
-other agents do not guess.
+1. **New API route**: Create `app/api/[name]/route.ts`
+2. **New component**: Add to `components/` with PascalCase filename
+3. **New page**: Add `app/[path]/page.tsx`
+4. **shadcn/ui component**: `npx shadcn@latest add [component]`
+5. **New types**: Add to `lib/types/` or colocate with feature
+
+## External Integrations
+
+| Platform | Auth Flow | Chat Bridge |
+|----------|-----------|-------------|
+| Twitch | OAuth → `/api/twitch/auth` | IRC via `TwitchBridge` |
+| YouTube | OAuth → `/api/youtube/auth` | Polling via `YouTubeBridge` |
+| Discord | OAuth → `/api/discord/auth` | Gateway via `DiscordBridge` |
+
+Bot tokens and OAuth tokens are stored in httpOnly cookies.
