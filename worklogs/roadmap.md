@@ -45,7 +45,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 
 ## Phase 3: Enhanced Features (In Progress)
 - [ ] Widget preview in dashboard (iframe-based)
-- [ ] Widget configuration UI
+- [x] Widget configuration UI (Completed - Jan 24, 2026)
 - [ ] Chat message sending (bi-directional)
 - [ ] Chat moderation controls (timeout, ban)
 - [ ] Message highlighting (mentions, keywords)

@@ -57,7 +57,7 @@ From `AGENTS.md`:
 - Prefer server components; add `"use client"` only when needed
 - Strict TypeScript - avoid `any`
 - Naming: `camelCase` (vars/functions), `PascalCase` (components/types), `UPPER_SNAKE_CASE` (constants)
-- Use `cn()` from `@/lib/utils` for className merging
+- Use `cn()` from `@/lib/shared/utils/cn` for className merging
 - CSS classes in `globals.css`; Tailwind for utilities
 - Return structured JSON errors from API routes
 - Fallback to demo data on API failures
