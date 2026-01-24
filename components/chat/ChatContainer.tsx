@@ -82,15 +82,17 @@ export function ChatContainer({
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
-      <div className="flex items-center justify-between border-b border-primary/10 pb-2 mb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground uppercase tracking-wider">
+      <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-3">
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Live Chat
           </span>
           <span
             className={cn(
-              "h-2 w-2 rounded-full",
-              connected ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/50"
+              "h-2 w-2 rounded-full transition-all",
+              connected 
+                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" 
+                : "bg-muted-foreground/40"
             )}
             title={connected ? "Connected" : "Disconnected"}
           />
@@ -101,16 +103,27 @@ export function ChatContainer({
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto space-y-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20"
+        className="flex-1 overflow-y-auto -mx-1 px-1"
       >
         {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
-            {connected
-              ? "Waiting for messages..."
-              : "Connect to a platform to see chat"}
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <div className="text-muted-foreground/60 text-sm">
+                {connected
+                  ? "Waiting for messages..."
+                  : "Connect to a platform to see chat"}
+              </div>
+              {!connected && (
+                <div className="mt-2 text-xs text-muted-foreground/40">
+                  Use the Chat Integrations panel to connect
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)
+          <div className="space-y-0.5">
+            {messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
+          </div>
         )}
       </div>
     </div>

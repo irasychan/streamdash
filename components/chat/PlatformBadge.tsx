@@ -9,21 +9,24 @@ type PlatformBadgeProps = {
 
 const platformConfig: Record<
   ChatPlatform,
-  { icon: string; color: string; label: string }
+  { icon: string; bg: string; glow: string; label: string }
 > = {
   twitch: {
     icon: "T",
-    color: "bg-[#9146FF]",
+    bg: "bg-[#9146FF]",
+    glow: "shadow-[0_0_8px_rgba(145,70,255,0.5)]",
     label: "Twitch",
   },
   youtube: {
     icon: "Y",
-    color: "bg-[#FF0000]",
+    bg: "bg-[#FF0000]",
+    glow: "shadow-[0_0_8px_rgba(255,0,0,0.5)]",
     label: "YouTube",
   },
   discord: {
     icon: "D",
-    color: "bg-[#5865F2]",
+    bg: "bg-[#5865F2]",
+    glow: "shadow-[0_0_8px_rgba(88,101,242,0.5)]",
     label: "Discord",
   },
 };
@@ -39,8 +42,9 @@ export function PlatformBadge({
     <span
       className={cn(
         "inline-flex items-center justify-center rounded font-bold text-white",
-        config.color,
-        size === "sm" ? "h-4 w-4 text-[10px]" : "h-5 w-5 text-xs",
+        config.bg,
+        config.glow,
+        size === "sm" ? "h-4 w-4 text-[10px]" : "h-6 w-6 text-xs",
         className
       )}
       title={config.label}
