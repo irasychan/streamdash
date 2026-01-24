@@ -58,6 +58,7 @@ export async function GET(request: Request) {
 
   response.cookies.set("twitch_access_token", tokenPayload.access_token, {
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: tokenPayload.expires_in,
@@ -65,6 +66,7 @@ export async function GET(request: Request) {
 
   response.cookies.set("twitch_refresh_token", tokenPayload.refresh_token, {
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
@@ -72,6 +74,7 @@ export async function GET(request: Request) {
 
   response.cookies.set("twitch_token_expires", expiresAt.toString(), {
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
@@ -79,6 +82,7 @@ export async function GET(request: Request) {
 
   response.cookies.set("twitch_oauth_state", "", {
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 0,
@@ -94,12 +98,14 @@ export async function GET(request: Request) {
     const validatePayload = await validateResponse.json();
     response.cookies.set("twitch_user_id", validatePayload.user_id, {
       httpOnly: true,
+      secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
     response.cookies.set("twitch_user_login", validatePayload.login, {
       httpOnly: true,
+      secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,

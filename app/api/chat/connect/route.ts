@@ -22,9 +22,10 @@ export async function POST(request: Request) {
     const body: ConnectRequest = await request.json();
     const { platform, channel, liveChatId, channelId } = body;
 
-    if (!platform) {
+    const validPlatforms = ["twitch", "youtube", "discord"] as const;
+    if (!platform || !validPlatforms.includes(platform)) {
       return NextResponse.json(
-        { ok: false, error: "Platform is required" },
+        { ok: false, error: "Invalid platform" },
         { status: 400 }
       );
     }
@@ -109,12 +110,14 @@ export async function POST(request: Request) {
         if (updatedToken) {
           response.cookies.set("youtube_access_token", updatedToken.accessToken, {
             httpOnly: true,
+            secure: true,
             sameSite: "lax",
             path: "/",
             maxAge: updatedToken.expiresIn,
           });
           response.cookies.set("youtube_token_expires", updatedToken.expiresAt.toString(), {
             httpOnly: true,
+            secure: true,
             sameSite: "lax",
             path: "/",
             maxAge: 60 * 60 * 24 * 30,
@@ -122,6 +125,7 @@ export async function POST(request: Request) {
           if (updatedToken.refreshToken) {
             response.cookies.set("youtube_refresh_token", updatedToken.refreshToken, {
               httpOnly: true,
+              secure: true,
               sameSite: "lax",
               path: "/",
               maxAge: 60 * 60 * 24 * 30,
@@ -155,19 +159,19 @@ export async function POST(request: Request) {
         });
       }
 
-      default:
+      default: {
+        // TypeScript exhaustiveness check - should never reach here
+        const _exhaustive: never = platform;
         return NextResponse.json(
           { ok: false, error: "Invalid platform" },
           { status: 400 }
         );
+      }
     }
   } catch (error) {
     console.error("[Chat Connect] Error:", error);
     return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Failed to connect",
-      },
+      { ok: false, error: "Failed to connect" },
       { status: 500 }
     );
   }

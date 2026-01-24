@@ -10,8 +10,8 @@ export async function GET() {
     const config = await loadConfig();
     return NextResponse.json({ ok: true, data: config });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to load config";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    console.error("[Config] GET error:", error);
+    return NextResponse.json({ ok: false, error: "Failed to load config" }, { status: 500 });
   }
 }
 
@@ -24,8 +24,8 @@ export async function PATCH(request: Request) {
     const config = await saveConfig(body);
     return NextResponse.json({ ok: true, data: config });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to save config";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    console.error("[Config] PATCH error:", error);
+    return NextResponse.json({ ok: false, error: "Failed to save config" }, { status: 500 });
   }
 }
 
@@ -37,7 +37,7 @@ export async function DELETE() {
     const config = await resetConfig();
     return NextResponse.json({ ok: true, data: config });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to reset config";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    console.error("[Config] DELETE error:", error);
+    return NextResponse.json({ ok: false, error: "Failed to reset config" }, { status: 500 });
   }
 }

@@ -9,6 +9,7 @@ type TokenResponse = {
 
 const tokenCookieOptions = {
   httpOnly: true,
+  secure: true,
   sameSite: "lax" as const,
   path: "/",
 };
