@@ -100,8 +100,8 @@ type ChatPlatform = "twitch" | "youtube" | "discord";
 import { NextResponse } from "next/server";         // Next.js
 import { cookies } from "next/headers";
 
-import { cn } from "@/lib/utils";                   // Local
-import type { ChatMessage } from "@/lib/types/chat";
+import { cn } from "@/lib/shared/utils/cn";         // Local
+import type { ChatMessage } from "@/features/chat/types/chat";
 ```
 
 ### Naming Conventions
@@ -121,12 +121,12 @@ import type { ChatMessage } from "@/lib/types/chat";
 - Use function components with explicit return types when complex
 - Prefer `"use client"` only when browser APIs are needed
 - Keep components small; extract logic into hooks or utilities
-- Use `cn()` from `@/lib/utils` for conditional Tailwind classes
+- Use `cn()` from `@/lib/shared/utils/cn` for conditional Tailwind classes
 
 ```typescript
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/shared/utils/cn";
 
 type Props = { active?: boolean; className?: string };
 
