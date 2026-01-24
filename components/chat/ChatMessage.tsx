@@ -4,7 +4,7 @@ import type { ChatMessage as ChatMessageType } from "@/lib/types/chat";
 import type { ChatDisplayPreferences } from "@/lib/types/preferences";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/utils";
-import { renderMessageWithEmotes } from "@/lib/chat/emoteRenderer";
+import { renderMessageWithEmotes } from "@/lib/chat/utils/emoteRenderer";
 import { useEmotes } from "@/hooks/useEmotes";
 
 type ChatMessageProps = {

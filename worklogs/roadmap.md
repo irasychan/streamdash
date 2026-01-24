@@ -34,11 +34,19 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] Platform connection status indicators
 - [x] Dedicated routes: /dashboard/chat, /stats, /widgets, /settings
 
+## Phase 2.6: Code Quality & Preferences (Completed - Jan 24, 2026)
+- [x] User preferences system (localStorage)
+- [x] Server-side config persistence (.data/user-config.json)
+- [x] Theme presets (Tokyo Night, Midnight, Cyberpunk, Forest, Sunset, Monochrome)
+- [x] Emote rendering (Twitch native, BTTV, FFZ, 7TV)
+- [x] Chat display preferences (font size, density, avatars, badges)
+- [x] Code style alignment with AGENTS.md guidelines
+- [x] lib/chat/ directory restructure (bridges/, utils/)
+
 ## Phase 3: Enhanced Features (In Progress)
-- [ ] Discord bot configuration wizard
-- [ ] Emote rendering (Twitch, BTTV, FFZ, 7TV)
+- [ ] Widget preview in dashboard (iframe-based)
+- [ ] Widget configuration UI
 - [ ] Chat message sending (bi-directional)
-- [ ] User badges display
 - [ ] Chat moderation controls (timeout, ban)
 - [ ] Message highlighting (mentions, keywords)
 

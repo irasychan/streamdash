@@ -4,13 +4,13 @@ import type {
   ChatConnectionStatus,
   SSEClient,
 } from "@/lib/types/chat";
-import { TwitchIRC } from "./TwitchIRC";
+import { TwitchIRC } from "./bridges/TwitchIRC";
 import {
   YouTubePoller,
   type YouTubeTokenState,
   type YouTubeTokenUpdate,
-} from "./YouTubePoller";
-import { DiscordBridge } from "./DiscordBridge";
+} from "./bridges/YouTubePoller";
+import { DiscordBridge } from "./bridges/DiscordBridge";
 
 const MESSAGE_BUFFER_SIZE = 100;
 

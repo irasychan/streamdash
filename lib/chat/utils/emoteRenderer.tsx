@@ -4,7 +4,7 @@ import type { ThirdPartyEmote } from "@/hooks/useEmotes";
 
 type EmoteSizeClass = "small" | "medium" | "large";
 
-const emoteSizeClasses: Record<EmoteSizeClass, string> = {
+const EMOTE_SIZE_CLASSES: Record<EmoteSizeClass, string> = {
   small: "h-4 w-auto",
   medium: "h-5 w-auto",
   large: "h-6 w-auto",
@@ -144,7 +144,7 @@ export function renderMessageWithEmotes(
           src={segment.emote.imageUrl}
           alt={segment.emote.name}
           title={segment.emote.name}
-          className={`inline-block align-middle ${emoteSizeClasses[size]}`}
+          className={`inline-block align-middle ${EMOTE_SIZE_CLASSES[size]}`}
           loading="lazy"
         />
       );
@@ -157,7 +157,7 @@ export function renderMessageWithEmotes(
         src={segment.emote.url}
         alt={segment.emote.name}
         title={`${segment.emote.name} (${segment.emote.source.toUpperCase()})`}
-        className={`inline-block align-middle ${emoteSizeClasses[size]}`}
+        className={`inline-block align-middle ${EMOTE_SIZE_CLASSES[size]}`}
         loading="lazy"
       />
     );

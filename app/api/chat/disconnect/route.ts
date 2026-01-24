@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectionManager } from "@/lib/chat/ConnectionManager";
+import { connectionManager } from "@/lib/chat";
 import type { ChatPlatform } from "@/lib/types/chat";
 
 export const dynamic = "force-dynamic";

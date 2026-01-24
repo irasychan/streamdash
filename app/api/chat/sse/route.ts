@@ -1,4 +1,4 @@
-import { connectionManager } from "@/lib/chat/ConnectionManager";
+import { connectionManager } from "@/lib/chat";
 import type { ChatMessage, SSEClient } from "@/lib/types/chat";
 
 export const dynamic = "force-dynamic";
