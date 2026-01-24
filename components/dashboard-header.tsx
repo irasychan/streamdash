@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { PlatformBadge } from "@/components/chat/PlatformBadge";
 import type { ChatConnectionStatus } from "@/lib/types/chat";
 import { cn } from "@/lib/utils";
+import { useDashboardStatus } from "@/contexts/DashboardStatusContext";
 
 const pathNames: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -17,14 +18,10 @@ const pathNames: Record<string, string> = {
   "/dashboard/settings": "Settings",
 };
 
-interface DashboardHeaderProps {
-  status?: string;
-  isLive?: boolean;
-}
-
-export function DashboardHeader({ status = "Demo mode", isLive = false }: DashboardHeaderProps) {
+export function DashboardHeader() {
   const pathname = usePathname();
   const title = pathNames[pathname] || "Dashboard";
+  const { status, isLive } = useDashboardStatus();
   const [connectionStatus, setConnectionStatus] = useState<ChatConnectionStatus[]>([]);
 
   useEffect(() => {

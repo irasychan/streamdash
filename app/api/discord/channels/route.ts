@@ -39,6 +39,16 @@ export async function GET(request: Request) {
           error: "Bot does not have access to this server. Make sure the bot is invited.",
         });
       }
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("Retry-After");
+        const retrySeconds = retryAfter ? Math.ceil(parseFloat(retryAfter)) : 5;
+        return NextResponse.json({
+          ok: false,
+          error: `Rate limited. Please wait ${retrySeconds} seconds.`,
+          rateLimited: true,
+          retryAfter: retrySeconds,
+        });
+      }
       return NextResponse.json({
         ok: false,
         error: `Discord API error: ${response.status}`,

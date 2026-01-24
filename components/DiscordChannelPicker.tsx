@@ -37,6 +37,7 @@ export function DiscordChannelPicker({
   const [loadingChannels, setLoadingChannels] = useState(false);
   const [error, setError] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
+  const [retryCountdown, setRetryCountdown] = useState<number>(0);
 
   // Check Discord auth status
   useEffect(() => {
@@ -62,6 +63,13 @@ export function DiscordChannelPicker({
       try {
         const response = await fetch("/api/discord/guilds");
         const data = await response.json();
+
+        if (data.rateLimited) {
+          const retrySeconds = data.retryAfter || 5;
+          setError(`Rate limited. Retrying in ${retrySeconds}s...`);
+          setRetryCountdown(retrySeconds);
+          return;
+        }
 
         if (data.needsRefresh) {
           // Try to refresh token
@@ -115,6 +123,12 @@ export function DiscordChannelPicker({
         );
         const data = await response.json();
 
+        if (data.rateLimited) {
+          const retrySeconds = data.retryAfter || 5;
+          setError(`Rate limited. Please wait ${retrySeconds}s before selecting a server.`);
+          return;
+        }
+
         if (data.ok) {
           setChannels(data.data);
         } else {
@@ -129,6 +143,41 @@ export function DiscordChannelPicker({
 
     loadChannels();
   }, [selectedGuildId]);
+
+  // Rate limit countdown and auto-retry
+  useEffect(() => {
+    if (retryCountdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setRetryCountdown((prev) => {
+        if (prev <= 1) {
+          // Trigger reload by toggling connected status effect
+          setError("");
+          // Re-fetch guilds
+          if (discordStatus?.connected) {
+            fetch("/api/discord/guilds")
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.ok) {
+                  setGuilds(data.data);
+                } else if (data.rateLimited) {
+                  setError(`Rate limited. Retrying in ${data.retryAfter || 5}s...`);
+                  setRetryCountdown(data.retryAfter || 5);
+                } else {
+                  setError(data.error || "Failed to load servers");
+                }
+              })
+              .catch(() => setError("Failed to load servers"));
+          }
+          return 0;
+        }
+        setError(`Rate limited. Retrying in ${prev - 1}s...`);
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [retryCountdown, discordStatus?.connected]);
 
   const handleChannelSelect = (channel: Channel) => {
     onChannelSelect(channel.id, `#${channel.name}`);

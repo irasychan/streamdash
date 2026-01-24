@@ -40,6 +40,16 @@ export async function GET() {
           needsRefresh: true,
         });
       }
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("Retry-After");
+        const retrySeconds = retryAfter ? Math.ceil(parseFloat(retryAfter)) : 5;
+        return NextResponse.json({
+          ok: false,
+          error: `Rate limited. Please wait ${retrySeconds} seconds.`,
+          rateLimited: true,
+          retryAfter: retrySeconds,
+        });
+      }
       return NextResponse.json({
         ok: false,
         error: `Discord API error: ${response.status}`,

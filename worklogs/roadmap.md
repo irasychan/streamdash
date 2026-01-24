@@ -24,11 +24,20 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] OBS chat widget with transparent mode
 - [x] Dashboard chat integration
 
-## Phase 3: Enhanced Features (Planned)
-- [ ] YouTube OAuth flow for user's own streams
-- [ ] Discord bot setup wizard
-- [ ] Chat message sending (bi-directional)
+## Phase 2.5: UX Redesign (Completed - Jan 24, 2026)
+- [x] Admin panel layout with shadcn sidebar
+- [x] Collapsible navigation with keyboard shortcuts
+- [x] Mobile-responsive drawer navigation
+- [x] Akira Neo Tokyo visual design overhaul
+- [x] Neon color palette and glow effects
+- [x] Dashboard status context for live state sharing
+- [x] Platform connection status indicators
+- [x] Dedicated routes: /dashboard/chat, /stats, /widgets, /settings
+
+## Phase 3: Enhanced Features (In Progress)
+- [ ] Discord bot configuration wizard
 - [ ] Emote rendering (Twitch, BTTV, FFZ, 7TV)
+- [ ] Chat message sending (bi-directional)
 - [ ] User badges display
 - [ ] Chat moderation controls (timeout, ban)
 - [ ] Message highlighting (mentions, keywords)
@@ -59,7 +68,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 ## Tech Stack
 - **Framework:** Next.js 16 (App Router)
 - **UI:** shadcn/ui + Tailwind CSS
-- **Language:** TypeScript
+- **Language:** TypeScript (strict mode)
 - **Real-time:** Server-Sent Events (SSE)
 - **External APIs:** Twitch Helix, YouTube Data API v3, Discord Gateway
 
@@ -73,6 +82,12 @@ YOUTUBE_API_KEY=
 # Optional (for full chat features)
 YOUTUBE_CLIENT_ID=
 YOUTUBE_CLIENT_SECRET=
-DISCORD_BOT_TOKEN=
-DISCORD_APPLICATION_ID=
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_BOT_TOKEN=          # Needs MESSAGE_CONTENT intent
 ```
+
+---
+
+## Current Focus
+See `/WORKLOG.md` for active tasks and priorities.

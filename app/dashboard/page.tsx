@@ -12,14 +12,17 @@ import { ChatContainer } from "@/components/chat";
 import { PlatformBadge } from "@/components/chat/PlatformBadge";
 import { DiscordChannelPicker } from "@/components/DiscordChannelPicker";
 import type { ChatConnectionStatus, ChatPlatform } from "@/lib/types/chat";
+import { useConfig } from "@/hooks/useConfig";
+import { useDashboardStatus } from "@/contexts/DashboardStatusContext";
 
 type DashboardStats = typeof demoStats;
 
 const refreshInterval = 20000;
 
 export default function DashboardPage() {
+  const { config, loading: configLoading } = useConfig();
+  const { status, setStatus, setIsLive } = useDashboardStatus();
   const [stats, setStats] = useState<DashboardStats>(demoStats);
-  const [status, setStatus] = useState("Demo mode");
   const [twitchStatus, setTwitchStatus] = useState("Checking Twitch auth...");
   const [appTokenStatus, setAppTokenStatus] = useState("App token not tested");
   const [appTokenBusy, setAppTokenBusy] = useState(false);
@@ -34,9 +37,21 @@ export default function DashboardPage() {
     youtube: "",
     discord: "",
   });
-  const [twitchChannel, setTwitchChannel] = useState(demoStats.channel);
+  // Local input state - initialized from persistent config
+  const [twitchChannel, setTwitchChannel] = useState("");
   const [youtubeLiveChatId, setYoutubeLiveChatId] = useState("");
   const [discordChannelId, setDiscordChannelId] = useState("");
+  const [configInitialized, setConfigInitialized] = useState(false);
+
+  // Sync local input state with config when config loads
+  useEffect(() => {
+    if (!configLoading && !configInitialized) {
+      setTwitchChannel(config.platforms.twitch.defaultChannel || demoStats.channel);
+      setYoutubeLiveChatId(config.platforms.youtube.defaultLiveChatId || "");
+      setDiscordChannelId(config.platforms.discord.defaultChannelId || "");
+      setConfigInitialized(true);
+    }
+  }, [config, configLoading, configInitialized]);
 
   const fetchChatStatus = useCallback(async () => {
     try {
@@ -54,10 +69,14 @@ export default function DashboardPage() {
     let isMounted = true;
 
     const loadStats = async () => {
+      // Use config channel if available, fallback to demo
+      const channelToFetch = config.platforms.twitch.defaultChannel || demoStats.channel;
+      const youtubeChannelToFetch = config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
+      
       try {
-        const twitchResponse = await fetch("/api/twitch?channel=" + demoStats.channel);
+        const twitchResponse = await fetch("/api/twitch?channel=" + channelToFetch);
         const youtubeResponse = await fetch(
-          "/api/youtube?channelId=" + demoStats.youtubeChannelId
+          "/api/youtube?channelId=" + youtubeChannelToFetch
         );
         const authResponse = await fetch("/api/twitch/status");
 
@@ -65,35 +84,50 @@ export default function DashboardPage() {
         const youtubeData = await youtubeResponse.json();
         const authData = await authResponse.json();
 
-        if (!twitchData.ok || !youtubeData.ok) {
-          setStatus("Demo mode (missing API keys)");
-          setTwitchStatus(authData.connected ? "Twitch connected" : "Twitch not connected");
-          return;
-        }
-
         if (isMounted) {
-          setStats({
+          const twitchOk = twitchData.ok;
+          const youtubeOk = youtubeData.ok;
+
+          // Build status based on which APIs succeeded
+          if (twitchOk && youtubeOk) {
+            setStatus("Live data");
+          } else if (twitchOk) {
+            setStatus("Twitch live · YouTube demo");
+          } else if (youtubeOk) {
+            setStatus("Twitch demo · YouTube live");
+          } else {
+            setStatus("Demo mode");
+          }
+
+          setTwitchStatus(authData.connected ? "Twitch auth OK" : "Twitch auth missing");
+
+          const newStats = {
             ...demoStats,
-            ...twitchData.data,
-            youtube: youtubeData.data,
-          });
-          setStatus("Live data connected");
-          setTwitchStatus(authData.connected ? "Twitch connected" : "Twitch not connected");
+            channel: channelToFetch,
+            ...(twitchOk ? twitchData.data : {}),
+            youtube: youtubeOk ? youtubeData.data : demoStats.youtube,
+          };
+          setStats(newStats);
+          setIsLive(newStats.live ?? false);
         }
-      } catch (error) {
+      } catch {
         setStatus("Demo mode (network error)");
+        setIsLive(false);
         setTwitchStatus("Twitch not connected");
       }
     };
 
-    loadStats();
-    const interval = setInterval(loadStats, refreshInterval);
+    // Only load stats once config is ready
+    if (!configLoading) {
+      loadStats();
+      const interval = setInterval(loadStats, refreshInterval);
 
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, []);
+      return () => {
+        isMounted = false;
+        clearInterval(interval);
+      };
+    }
+  }, [config, configLoading]);
 
   useEffect(() => {
     fetchChatStatus();
@@ -166,23 +200,26 @@ export default function DashboardPage() {
     setAppTokenBusy(true);
     setAppTokenStatus("Testing client credentials...");
     try {
-      const response = await fetch("/api/twitch?channel=" + demoStats.channel);
+      const channelToTest = config.platforms.twitch.defaultChannel || demoStats.channel;
+      const response = await fetch("/api/twitch?channel=" + channelToTest);
       const payload = await response.json();
       if (payload.ok) {
         setAppTokenStatus("Client credentials OK");
       } else {
         setAppTokenStatus(payload.error ?? "Client credentials failed");
       }
-    } catch (error) {
+    } catch {
       setAppTokenStatus("Client credentials failed");
     } finally {
       setAppTokenBusy(false);
     }
   };
 
+  // Use config goal target if set, otherwise fallback to stats
+  const goalTarget = config.goals.followerTarget || stats.goal.target;
   const goalPercent = Math.min(
     100,
-    Math.round((stats.goal.current / stats.goal.target) * 100)
+    Math.round((stats.goal.current / goalTarget) * 100)
   );
 
   const twitchConnection = getPlatformStatus("twitch");
@@ -248,7 +285,7 @@ export default function DashboardPage() {
             </p>
             <Progress value={goalPercent} className="mt-3 h-2" />
             <p className="mt-2 text-xs text-muted-foreground">
-              {stats.goal.current.toLocaleString()} / {stats.goal.target.toLocaleString()}
+              {stats.goal.current.toLocaleString()} / {goalTarget.toLocaleString()}
             </p>
           </CardContent>
         </Card>

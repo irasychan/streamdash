@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ChatMessage as ChatMessageType } from "@/lib/types/chat";
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage, densityGapClasses } from "./ChatMessage";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { demoChatMessages } from "@/lib/demoData";
 import { cn } from "@/lib/utils";
+import { usePreferences } from "@/hooks/usePreferences";
+import type { ChatDisplayPreferences } from "@/lib/types/preferences";
 
 type ChatContainerProps = {
   maxMessages?: number;
@@ -24,6 +26,8 @@ export function ChatContainer({
   const [connected, setConnected] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
+  const { preferences } = usePreferences();
+  const chatPrefs = preferences.chat;
 
   useEffect(() => {
     const eventSource = new EventSource("/api/chat/sse");
@@ -121,8 +125,10 @@ export function ChatContainer({
             </div>
           </div>
         ) : (
-          <div className="space-y-0.5">
-            {messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
+          <div className={densityGapClasses[chatPrefs.messageDensity]}>
+            {messages.map((msg) => (
+              <ChatMessage key={msg.id} message={msg} chatPrefs={chatPrefs} />
+            ))}
           </div>
         )}
       </div>
