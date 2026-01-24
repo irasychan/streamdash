@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
+import { EmoteProvider, useEmotes } from "@/hooks/useEmotes";
 import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/lib/types/chat";
 
 function ChatWidgetContent() {
@@ -14,6 +15,7 @@ function ChatWidgetContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
   const searchParams = useSearchParams();
+  const { loadEmotes } = useEmotes();
 
   // Widget configuration from URL params
   const maxMessages = useMemo(
@@ -33,6 +35,21 @@ function ChatWidgetContent() {
     [searchParams]
   );
 
+  // Load emotes for Twitch channel
+  const loadChannelEmotes = useCallback(async (channel: string) => {
+    try {
+      const response = await fetch(`/api/twitch/user?username=${encodeURIComponent(channel)}`);
+      const data = await response.json();
+      
+      if (data.ok && data.data?.id) {
+        console.log(`[ChatWidget] Loading emotes for channel ${channel} (ID: ${data.data.id})`);
+        await loadEmotes(data.data.id);
+      }
+    } catch (error) {
+      console.error("[ChatWidget] Failed to load channel emotes:", error);
+    }
+  }, [loadEmotes]);
+
   // Auto-connect to platforms based on URL params
   useEffect(() => {
     const connectPlatforms = async () => {
@@ -50,6 +67,8 @@ function ChatWidgetContent() {
             body: JSON.stringify({ platform: "twitch", channel: twitchChannel }),
           })
         );
+        // Load emotes for the channel
+        loadChannelEmotes(twitchChannel);
       }
 
       if (youtubeVideoId) {
@@ -83,7 +102,7 @@ function ChatWidgetContent() {
     };
 
     connectPlatforms();
-  }, [searchParams]);
+  }, [searchParams, loadChannelEmotes]);
 
   // SSE connection for receiving messages
   useEffect(() => {
@@ -181,10 +200,12 @@ function ChatWidgetSkeleton() {
 
 export default function ChatWidget() {
   return (
-    <main className="p-4 min-h-screen">
-      <Suspense fallback={<ChatWidgetSkeleton />}>
-        <ChatWidgetContent />
-      </Suspense>
-    </main>
+    <EmoteProvider>
+      <main className="p-4 min-h-screen">
+        <Suspense fallback={<ChatWidgetSkeleton />}>
+          <ChatWidgetContent />
+        </Suspense>
+      </main>
+    </EmoteProvider>
   );
 }

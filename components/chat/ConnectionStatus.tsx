@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { ChatConnectionStatus } from "@/lib/types/chat";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/utils";
+import { useChatStatus } from "@/contexts/ChatStatusContext";
 
 type ConnectionStatusProps = {
   className?: string;
@@ -11,27 +10,7 @@ type ConnectionStatusProps = {
 };
 
 export function ConnectionStatus({ className, showLabels = false }: ConnectionStatusProps) {
-  const [status, setStatus] = useState<ChatConnectionStatus[]>([]);
-
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await fetch("/api/chat/status");
-        const data = await response.json();
-        if (data.ok) {
-          setStatus(data.data.platforms);
-        }
-      } catch {
-        // Ignore errors
-      }
-    };
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const connectedCount = status.filter(s => s.connected).length;
+  const { status } = useChatStatus();
 
   return (
     <div className={cn("flex items-center gap-3", className)}>

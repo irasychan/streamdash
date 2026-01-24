@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatBadge } from "@/lib/types/chat";
+import type { ChatMessage, ChatBadge, ChatEmote } from "@/lib/types/chat";
 
 type MessageCallback = (message: ChatMessage) => void;
 
@@ -166,6 +166,7 @@ export class TwitchIRC {
           badges: this.parseBadges(tags["badges"]),
         },
         content,
+        emotes: this.parseEmotes(tags["emotes"], content),
         isModerator: tags["mod"] === "1",
         isSubscriber: tags["subscriber"] === "1",
       };
@@ -199,6 +200,50 @@ export class TwitchIRC {
         imageUrl: `https://static-cdn.jtvnw.net/badges/v1/${name}/${version}/1`,
       };
     });
+  }
+
+  /**
+   * Parse Twitch emote tags into ChatEmote array
+   * Format: emotes=emoteId:start-end,start-end/emoteId:start-end
+   * Example: emotes=25:0-4,6-10/1902:12-16
+   */
+  private parseEmotes(emoteString?: string, content?: string): ChatEmote[] {
+    if (!emoteString || !content) return [];
+
+    const emotes: ChatEmote[] = [];
+
+    // Split by "/" to get each emote type
+    const emoteGroups = emoteString.split("/");
+
+    for (const group of emoteGroups) {
+      const [emoteId, positions] = group.split(":");
+      if (!emoteId || !positions) continue;
+
+      // Split positions by "," for multiple occurrences
+      const positionList = positions.split(",");
+
+      for (const pos of positionList) {
+        const [startStr, endStr] = pos.split("-");
+        const start = parseInt(startStr, 10);
+        const end = parseInt(endStr, 10);
+
+        if (isNaN(start) || isNaN(end)) continue;
+
+        // Extract the emote name from content (end is inclusive in Twitch)
+        const emoteName = content.substring(start, end + 1);
+
+        emotes.push({
+          id: emoteId,
+          name: emoteName,
+          start,
+          end: end + 1, // Convert to exclusive end for easier substring operations
+          imageUrl: `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/2.0`,
+        });
+      }
+    }
+
+    // Sort by start position for easier rendering
+    return emotes.sort((a, b) => a.start - b.start);
   }
 
   private getDefaultColor(username: string): string {

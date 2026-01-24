@@ -1,7 +1,11 @@
+"use client";
+
 import type { ChatMessage as ChatMessageType } from "@/lib/types/chat";
 import type { ChatDisplayPreferences } from "@/lib/types/preferences";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/utils";
+import { renderMessageWithEmotes } from "@/lib/chat/emoteRenderer";
+import { useEmotes } from "@/hooks/useEmotes";
 
 type ChatMessageProps = {
   message: ChatMessageType;
@@ -44,13 +48,16 @@ export function ChatMessage({
   className,
   chatPrefs,
 }: ChatMessageProps) {
-  const { author, content, platform, isModerator, isSubscriber } = message;
+  const { author, content, platform, emotes, isModerator, isSubscriber } = message;
+  const { emotes: thirdPartyEmotes } = useEmotes();
 
   // Default preferences if not provided
   const fontSize = chatPrefs?.fontSize ?? "medium";
   const density = chatPrefs?.messageDensity ?? "comfortable";
   const showAvatars = chatPrefs?.showAvatars ?? true;
   const showBadges = chatPrefs?.showBadges ?? true;
+  const showTwitchEmotes = chatPrefs?.showTwitchEmotes ?? true;
+  const showThirdPartyEmotes = chatPrefs?.showThirdPartyEmotes ?? true;
   const fontFamily = chatPrefs?.fontFamily || undefined;
 
   return (
@@ -104,7 +111,15 @@ export function ChatMessage({
           )}
         </span>
         <span className="mx-1 text-muted-foreground/60">:</span>
-        <span className="break-words text-foreground/90 leading-relaxed">{content}</span>
+        <span className="break-words text-foreground/90 leading-relaxed">
+          {renderMessageWithEmotes(
+            content,
+            emotes,
+            fontSize,
+            thirdPartyEmotes,
+            { showTwitchEmotes, showThirdPartyEmotes }
+          )}
+        </span>
       </div>
     </div>
   );

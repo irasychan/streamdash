@@ -1,14 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { PlatformBadge } from "@/components/chat/PlatformBadge";
-import type { ChatConnectionStatus } from "@/lib/types/chat";
 import { cn } from "@/lib/utils";
 import { useDashboardStatus } from "@/contexts/DashboardStatusContext";
+import { useChatStatus } from "@/contexts/ChatStatusContext";
 
 const pathNames: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -22,25 +21,7 @@ export function DashboardHeader() {
   const pathname = usePathname();
   const title = pathNames[pathname] || "Dashboard";
   const { status, isLive } = useDashboardStatus();
-  const [connectionStatus, setConnectionStatus] = useState<ChatConnectionStatus[]>([]);
-
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await fetch("/api/chat/status");
-        const data = await response.json();
-        if (data.ok) {
-          setConnectionStatus(data.data.platforms);
-        }
-      } catch {
-        // Ignore errors
-      }
-    };
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const { status: connectionStatus } = useChatStatus();
 
   const connectedPlatforms = connectionStatus.filter(s => s.connected);
 

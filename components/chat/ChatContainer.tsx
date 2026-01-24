@@ -7,6 +7,8 @@ import { ConnectionStatus } from "./ConnectionStatus";
 import { demoChatMessages } from "@/lib/demoData";
 import { cn } from "@/lib/utils";
 import { usePreferences } from "@/hooks/usePreferences";
+import { useEmotes } from "@/hooks/useEmotes";
+import { useChatStatus } from "@/contexts/ChatStatusContext";
 import type { ChatDisplayPreferences } from "@/lib/types/preferences";
 
 type ChatContainerProps = {
@@ -27,7 +29,18 @@ export function ChatContainer({
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
   const { preferences } = usePreferences();
+  const { loadEmotes } = useEmotes();
+  const { getTwitchUserId } = useChatStatus();
   const chatPrefs = preferences.chat;
+
+  // Load emotes when Twitch user ID becomes available
+  const twitchUserId = getTwitchUserId();
+  useEffect(() => {
+    if (twitchUserId) {
+      console.log(`[ChatContainer] Loading emotes for user ID: ${twitchUserId}`);
+      loadEmotes(twitchUserId);
+    }
+  }, [twitchUserId, loadEmotes]);
 
   useEffect(() => {
     const eventSource = new EventSource("/api/chat/sse");

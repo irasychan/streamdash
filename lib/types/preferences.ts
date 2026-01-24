@@ -28,6 +28,10 @@ export type ChatDisplayPreferences = {
   showBadges: boolean;
   /** Show user avatars */
   showAvatars: boolean;
+  /** Show native Twitch emotes */
+  showTwitchEmotes: boolean;
+  /** Show third-party emotes (BTTV, FFZ, 7TV) */
+  showThirdPartyEmotes: boolean;
 };
 
 // --- Theme Preferences ---
@@ -66,6 +70,8 @@ export const DEFAULT_CHAT_PREFERENCES: ChatDisplayPreferences = {
   usernameColorMode: "platform",
   showBadges: true,
   showAvatars: true,
+  showTwitchEmotes: true,
+  showThirdPartyEmotes: true,
 };
 
 export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {

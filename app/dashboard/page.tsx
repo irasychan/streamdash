@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,10 @@ import { demoStats } from "@/lib/demoData";
 import { ChatContainer } from "@/components/chat";
 import { PlatformBadge } from "@/components/chat/PlatformBadge";
 import { DiscordChannelPicker } from "@/components/DiscordChannelPicker";
-import type { ChatConnectionStatus, ChatPlatform } from "@/lib/types/chat";
+import type { ChatPlatform } from "@/lib/types/chat";
 import { useConfig } from "@/hooks/useConfig";
 import { useDashboardStatus } from "@/contexts/DashboardStatusContext";
+import { useChatStatus } from "@/contexts/ChatStatusContext";
 
 type DashboardStats = typeof demoStats;
 
@@ -22,11 +23,11 @@ const refreshInterval = 20000;
 export default function DashboardPage() {
   const { config, loading: configLoading } = useConfig();
   const { status, setStatus, setIsLive } = useDashboardStatus();
+  const { status: chatStatus, refresh: refreshChatStatus } = useChatStatus();
   const [stats, setStats] = useState<DashboardStats>(demoStats);
   const [twitchStatus, setTwitchStatus] = useState("Checking Twitch auth...");
   const [appTokenStatus, setAppTokenStatus] = useState("App token not tested");
   const [appTokenBusy, setAppTokenBusy] = useState(false);
-  const [chatStatus, setChatStatus] = useState<ChatConnectionStatus[]>([]);
   const [chatBusy, setChatBusy] = useState<Record<ChatPlatform, boolean>>({
     twitch: false,
     youtube: false,
@@ -52,18 +53,6 @@ export default function DashboardPage() {
       setConfigInitialized(true);
     }
   }, [config, configLoading, configInitialized]);
-
-  const fetchChatStatus = useCallback(async () => {
-    try {
-      const response = await fetch("/api/chat/status");
-      const data = await response.json();
-      if (data.ok) {
-        setChatStatus(data.data.platforms);
-      }
-    } catch {
-      // Ignore errors
-    }
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -129,12 +118,6 @@ export default function DashboardPage() {
     }
   }, [config, configLoading]);
 
-  useEffect(() => {
-    fetchChatStatus();
-    const interval = setInterval(fetchChatStatus, 5000);
-    return () => clearInterval(interval);
-  }, [fetchChatStatus]);
-
   const connectPlatform = async (platform: ChatPlatform) => {
     setChatBusy((prev) => ({ ...prev, [platform]: true }));
     setChatNotes((prev) => ({ ...prev, [platform]: "Connecting..." }));
@@ -166,7 +149,7 @@ export default function DashboardPage() {
       setChatNotes((prev) => ({ ...prev, [platform]: "Request failed" }));
     } finally {
       setChatBusy((prev) => ({ ...prev, [platform]: false }));
-      await fetchChatStatus();
+      await refreshChatStatus();
     }
   };
 
@@ -189,7 +172,7 @@ export default function DashboardPage() {
       setChatNotes((prev) => ({ ...prev, [platform]: "Request failed" }));
     } finally {
       setChatBusy((prev) => ({ ...prev, [platform]: false }));
-      await fetchChatStatus();
+      await refreshChatStatus();
     }
   };
 

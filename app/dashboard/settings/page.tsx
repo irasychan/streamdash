@@ -391,6 +391,38 @@ export default function SettingsPage() {
                   }
                 />
               </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="show-twitch-emotes">Twitch Emotes</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Display native Twitch emotes in chat
+                  </p>
+                </div>
+                <Switch
+                  id="show-twitch-emotes"
+                  checked={preferences.chat.showTwitchEmotes}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({ chat: { showTwitchEmotes: checked } })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="show-third-party-emotes">Third-Party Emotes</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Display BTTV, FFZ, and 7TV emotes
+                  </p>
+                </div>
+                <Switch
+                  id="show-third-party-emotes"
+                  checked={preferences.chat.showThirdPartyEmotes}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({ chat: { showThirdPartyEmotes: checked } })
+                  }
+                />
+              </div>
             </div>
 
             <Separator />
