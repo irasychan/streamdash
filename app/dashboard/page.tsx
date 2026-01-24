@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { demoStats } from "@/lib/demoData";
+import { ChatContainer } from "@/components/chat";
+import { PlatformBadge } from "@/components/chat/PlatformBadge";
+import type { ChatConnectionStatus, ChatPlatform } from "@/lib/types/chat";
 
 type DashboardStats = typeof demoStats;
 
@@ -19,6 +22,32 @@ export default function DashboardPage() {
   const [twitchStatus, setTwitchStatus] = useState("Checking Twitch auth...");
   const [appTokenStatus, setAppTokenStatus] = useState("App token not tested");
   const [appTokenBusy, setAppTokenBusy] = useState(false);
+  const [chatStatus, setChatStatus] = useState<ChatConnectionStatus[]>([]);
+  const [chatBusy, setChatBusy] = useState<Record<ChatPlatform, boolean>>({
+    twitch: false,
+    youtube: false,
+    discord: false,
+  });
+  const [chatNotes, setChatNotes] = useState<Record<ChatPlatform, string>>({
+    twitch: "",
+    youtube: "",
+    discord: "",
+  });
+  const [twitchChannel, setTwitchChannel] = useState(demoStats.channel);
+  const [youtubeLiveChatId, setYoutubeLiveChatId] = useState("");
+  const [discordChannelId, setDiscordChannelId] = useState("");
+
+  const fetchChatStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/chat/status");
+      const data = await response.json();
+      if (data.ok) {
+        setChatStatus(data.data.platforms);
+      }
+    } catch {
+      // Ignore errors
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -65,6 +94,73 @@ export default function DashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    fetchChatStatus();
+    const interval = setInterval(fetchChatStatus, 5000);
+    return () => clearInterval(interval);
+  }, [fetchChatStatus]);
+
+  const connectPlatform = async (platform: ChatPlatform) => {
+    setChatBusy((prev) => ({ ...prev, [platform]: true }));
+    setChatNotes((prev) => ({ ...prev, [platform]: "Connecting..." }));
+    try {
+      let body: Record<string, string> = { platform };
+      if (platform === "twitch") {
+        body = { platform, channel: twitchChannel };
+      }
+      if (platform === "youtube") {
+        body = { platform, liveChatId: youtubeLiveChatId };
+      }
+      if (platform === "discord") {
+        body = { platform, channelId: discordChannelId };
+      }
+
+      const response = await fetch("/api/chat/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      if (data.ok) {
+        setChatNotes((prev) => ({ ...prev, [platform]: "Connected" }));
+      } else {
+        setChatNotes((prev) => ({ ...prev, [platform]: data.error ?? "Failed" }));
+      }
+    } catch {
+      setChatNotes((prev) => ({ ...prev, [platform]: "Request failed" }));
+    } finally {
+      setChatBusy((prev) => ({ ...prev, [platform]: false }));
+      await fetchChatStatus();
+    }
+  };
+
+  const disconnectPlatform = async (platform: ChatPlatform) => {
+    setChatBusy((prev) => ({ ...prev, [platform]: true }));
+    setChatNotes((prev) => ({ ...prev, [platform]: "Disconnecting..." }));
+    try {
+      const response = await fetch("/api/chat/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform }),
+      });
+      const data = await response.json();
+      if (data.ok) {
+        setChatNotes((prev) => ({ ...prev, [platform]: "Disconnected" }));
+      } else {
+        setChatNotes((prev) => ({ ...prev, [platform]: data.error ?? "Failed" }));
+      }
+    } catch {
+      setChatNotes((prev) => ({ ...prev, [platform]: "Request failed" }));
+    } finally {
+      setChatBusy((prev) => ({ ...prev, [platform]: false }));
+      await fetchChatStatus();
+    }
+  };
+
+  const getPlatformStatus = (platform: ChatPlatform) =>
+    chatStatus.find((item) => item.platform === platform);
+
   const testAppToken = async () => {
     setAppTokenBusy(true);
     setAppTokenStatus("Testing client credentials...");
@@ -88,11 +184,15 @@ export default function DashboardPage() {
     Math.round((stats.goal.current / stats.goal.target) * 100)
   );
 
+  const twitchConnection = getPlatformStatus("twitch");
+  const youtubeConnection = getPlatformStatus("youtube");
+  const discordConnection = getPlatformStatus("discord");
+
   return (
     <main className="page">
       <div className="page-inner">
         {/* Header Card */}
-        <Card className="border-primary/40 bg-gradient-to-br from-secondary/95 to-card/95 shadow-[0_0_0_1px_rgba(246,183,91,0.2),0_10px_30px_rgba(246,183,91,0.15)]">
+        <Card className="border-primary/40 bg-gradient-to-br from-secondary/95 to-card/95 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]">
           <CardContent className="pt-6">
             <div className="flex justify-between gap-5">
               <div>
@@ -201,11 +301,252 @@ export default function DashboardPage() {
                     Follower goal widget
                   </a>
                 </Button>
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-auto justify-start border-primary/20 bg-secondary/40 px-4 py-3 hover:border-primary/40 hover:bg-secondary/60"
+                >
+                  <a href="/widgets/chat" target="_blank" rel="noreferrer">
+                    Chat overlay widget
+                  </a>
+                </Button>
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-auto justify-start border-primary/20 bg-secondary/40 px-4 py-3 hover:border-primary/40 hover:bg-secondary/60"
+                >
+                  <a href="/widgets/chat?transparent=true" target="_blank" rel="noreferrer">
+                    Chat (transparent)
+                  </a>
+                </Button>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
                 Use these URLs in OBS browser sources. Add ?channel=YOURNAME or
                 ?youtubeChannelId=YOURID to override defaults.
               </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Chat Integrations */}
+        <section>
+          <Card className="border-primary/15 bg-gradient-to-br from-secondary/95 to-card/95">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-display">Chat integrations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 lg:grid-cols-3">
+                <div className="rounded-lg border border-primary/15 bg-secondary/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PlatformBadge platform="twitch" size="md" />
+                      <div>
+                        <p className="font-medium">Twitch</p>
+                        <p className="text-xs text-muted-foreground">
+                          {twitchConnection?.connected
+                            ? `Connected to ${twitchConnection.channel}`
+                            : "Disconnected"}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        twitchConnection?.connected
+                          ? "bg-emerald-500"
+                          : "bg-muted-foreground/50"
+                      }`}
+                    />
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Channel
+                    </label>
+                    <input
+                      value={twitchChannel}
+                      onChange={(event) => setTwitchChannel(event.target.value)}
+                      placeholder="twitch_channel"
+                      className="w-full rounded-md border border-primary/20 bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    {twitchConnection?.connected ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => disconnectPlatform("twitch")}
+                        disabled={chatBusy.twitch}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.twitch ? "Disconnecting..." : "Disconnect"}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => connectPlatform("twitch")}
+                        disabled={!twitchChannel || chatBusy.twitch}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.twitch ? "Connecting..." : "Connect"}
+                      </Button>
+                    )}
+                    <span className="text-xs text-muted-foreground">{chatNotes.twitch}</span>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    OAuth recommended for authenticated chat. {" "}
+                    <Link href="/api/twitch/auth" className="text-primary hover:underline">
+                      Connect Twitch auth
+                    </Link>
+                    .
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-primary/15 bg-secondary/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PlatformBadge platform="youtube" size="md" />
+                      <div>
+                        <p className="font-medium">YouTube</p>
+                        <p className="text-xs text-muted-foreground">
+                          {youtubeConnection?.connected
+                            ? `Connected to ${youtubeConnection.channel}`
+                            : "Disconnected"}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        youtubeConnection?.connected
+                          ? "bg-emerald-500"
+                          : "bg-muted-foreground/50"
+                      }`}
+                    />
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Live chat ID
+                    </label>
+                    <input
+                      value={youtubeLiveChatId}
+                      onChange={(event) => setYoutubeLiveChatId(event.target.value)}
+                      placeholder="live_chat_id"
+                      className="w-full rounded-md border border-primary/20 bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    {youtubeConnection?.connected ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => disconnectPlatform("youtube")}
+                        disabled={chatBusy.youtube}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.youtube ? "Disconnecting..." : "Disconnect"}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => connectPlatform("youtube")}
+                        disabled={!youtubeLiveChatId || chatBusy.youtube}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.youtube ? "Connecting..." : "Connect"}
+                      </Button>
+                    )}
+                    <span className="text-xs text-muted-foreground">{chatNotes.youtube}</span>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Requires `youtube_access_token` cookie and an active live chat ID.
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    <Link href="/api/youtube/auth" className="text-primary hover:underline">
+                      Connect YouTube auth
+                    </Link>
+                    .
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-primary/15 bg-secondary/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PlatformBadge platform="discord" size="md" />
+                      <div>
+                        <p className="font-medium">Discord</p>
+                        <p className="text-xs text-muted-foreground">
+                          {discordConnection?.connected
+                            ? `Connected to ${discordConnection.channel}`
+                            : "Disconnected"}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        discordConnection?.connected
+                          ? "bg-emerald-500"
+                          : "bg-muted-foreground/50"
+                      }`}
+                    />
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Channel ID
+                    </label>
+                    <input
+                      value={discordChannelId}
+                      onChange={(event) => setDiscordChannelId(event.target.value)}
+                      placeholder="discord_channel_id"
+                      className="w-full rounded-md border border-primary/20 bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    {discordConnection?.connected ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => disconnectPlatform("discord")}
+                        disabled={chatBusy.discord}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.discord ? "Disconnecting..." : "Disconnect"}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => connectPlatform("discord")}
+                        disabled={!discordChannelId || chatBusy.discord}
+                        className="border-primary/30"
+                      >
+                        {chatBusy.discord ? "Connecting..." : "Connect"}
+                      </Button>
+                    )}
+                    <span className="text-xs text-muted-foreground">{chatNotes.discord}</span>
+                  </div>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Uses the server bot token and guild channel ID.
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      <Link href="/api/discord/auth" className="text-primary hover:underline">
+                        Connect Discord auth
+                      </Link>
+                      .
+                    </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Unified Chat */}
+        <section>
+          <Card className="border-primary/15 bg-gradient-to-br from-secondary/95 to-card/95">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-display">Unified Chat</CardTitle>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ChatContainer />
             </CardContent>
           </Card>
         </section>

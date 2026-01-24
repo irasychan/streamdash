@@ -65,7 +65,7 @@ function StatsWidgetContent() {
   }, [channel, youtubeChannelId, youtubeHandle]);
 
   return (
-    <Card className="border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(246,183,91,0.2),0_10px_30px_rgba(246,183,91,0.15)]">
+    <Card className="border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]">
       <CardContent className="pt-5 pb-4">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Stream pulse

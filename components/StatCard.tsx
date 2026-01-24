@@ -28,7 +28,7 @@ export default function StatCard({
         </p>
         <p
           className={cn(
-            "mt-2 mb-1 font-display text-4xl",
+            "stat-value mt-2 mb-1 font-display text-4xl",
             accentStyles[accent]
           )}
         >

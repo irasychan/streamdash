@@ -1,8 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { Sora, Space_Grotesk } from "next/font/google";
 
-const bodyFont = IBM_Plex_Sans({
+const bodyFont = Sora({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-body",

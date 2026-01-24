@@ -114,6 +114,10 @@ Follow the existing Next.js + TypeScript patterns in `app/` and `components/`.
 - `TWITCH_CLIENT_SECRET`: Twitch app client secret.
 - `TWITCH_APP_ACCESS_TOKEN`: Optional Twitch app access token (client credentials flow will auto-fetch if missing).
 - `YOUTUBE_API_KEY`: YouTube Data API key.
+- `YOUTUBE_CLIENT_ID`: YouTube OAuth client id.
+- `YOUTUBE_CLIENT_SECRET`: YouTube OAuth client secret.
+- `DISCORD_CLIENT_ID`: Discord OAuth client id.
+- `DISCORD_CLIENT_SECRET`: Discord OAuth client secret.
 
 ## Recommended Defaults for New Code
 
