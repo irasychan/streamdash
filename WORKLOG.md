@@ -2,6 +2,36 @@
 
 ## Recently Completed
 
+### Widget Configuration UI
+**Date:** 2026-01-24
+**Status:** Complete
+
+Added expandable config cards on the Widgets page for all three widget types (Chat, Goal, Stats).
+
+**Changes:**
+- Added widget config types (`ChatWidgetConfig`, `GoalWidgetConfig`, `StatsWidgetConfig`) to `lib/types/config.ts`
+- Extended `StreamDashConfig` with `widgets` section and defaults
+- Created `WidgetConfigCard` component with collapsible config panel
+- Created `ChatWidgetConfigForm` for chat-specific options
+- Added inline `GoalWidgetConfigForm` and `StatsWidgetConfigForm` 
+- Created `lib/widgets/urlGenerator.ts` with URL builders for each widget type
+- Rewrote `app/dashboard/widgets/page.tsx` to use new config cards
+- Settings persist via existing config API to `.data/user-config.json`
+- URL is auto-generated from config and displayed in the card
+
+**Files Created:**
+- `components/widgets/WidgetConfigCard.tsx`
+- `components/widgets/ChatWidgetConfigForm.tsx`
+- `lib/widgets/urlGenerator.ts`
+- `components/ui/collapsible.tsx` (via shadcn)
+- `components/ui/checkbox.tsx` (via shadcn)
+
+**Files Modified:**
+- `lib/types/config.ts`
+- `app/dashboard/widgets/page.tsx`
+
+---
+
 ### Follower Goal Widget Fix
 **Date:** 2026-01-24
 **Status:** Complete
@@ -24,21 +54,10 @@ Fixed the follower goal widget to display real follower counts instead of hardco
 **Priority:** Medium
 **Status:** Pending
 
-- [ ] Add live preview component for widgets
+- [ ] Add live iframe preview in the config cards
 - [ ] Show chat widget preview
 - [ ] Show goal widget preview
 - [ ] Show stats widget preview
-- [ ] Add iframe-based preview mode
-
-### Widget Configuration
-**Priority:** Medium
-**Status:** Pending
-
-- [ ] Create widget config UI in dashboard
-- [ ] Add theme/style customization options
-- [ ] Add size/layout configuration
-- [ ] Persist widget settings to config store
-- [ ] Generate OBS browser source URLs with config params
 
 ### Stream Analytics
 **Priority:** Low
