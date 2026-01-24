@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { demoStats } from "@/lib/demoData";
-import { loadConfig } from "@/lib/config/configStore";
+import { loadConfig } from "@/server/config";
 
 type TwitchToken = {
   accessToken: string;

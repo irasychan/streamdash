@@ -1,5 +1,5 @@
-import { connectionManager } from "@/lib/chat";
-import type { ChatMessage, SSEClient } from "@/lib/types/chat";
+import { connectionManager } from "@/services/chat/ConnectionManager";
+import type { ChatMessage, SSEClient } from "@/features/chat/types/chat";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { connectionManager } from "@/services/chat/ConnectionManager";
 import {
-  connectionManager,
   loadYouTubeToken,
   saveYouTubeToken,
-} from "@/lib/chat";
-import type { ChatPlatform } from "@/lib/types/chat";
+} from "@/features/chat/utils/youtubeTokenStore";
+import type { ChatPlatform } from "@/features/chat/types/chat";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

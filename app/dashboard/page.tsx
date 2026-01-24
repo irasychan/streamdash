@@ -8,13 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { demoStats } from "@/lib/demoData";
-import { ChatContainer } from "@/components/chat";
-import { PlatformBadge } from "@/components/chat/PlatformBadge";
+import { ChatContainer, PlatformBadge } from "@/features/chat/components";
 import { DiscordChannelPicker } from "@/components/DiscordChannelPicker";
-import type { ChatPlatform } from "@/lib/types/chat";
-import { useConfig } from "@/hooks/useConfig";
-import { useDashboardStatus } from "@/contexts/DashboardStatusContext";
-import { useChatStatus } from "@/contexts/ChatStatusContext";
+import type { ChatPlatform } from "@/features/chat/types/chat";
+import { useConfig } from "@/features/config/useConfig";
+import { useDashboardStatus } from "@/features/dashboard/hooks/useDashboardStatus";
+import { useChatStatus } from "@/features/chat/hooks/useChatStatus";
 
 type DashboardStats = typeof demoStats;
 
@@ -116,7 +115,7 @@ export default function DashboardPage() {
         clearInterval(interval);
       };
     }
-  }, [config, configLoading]);
+  }, [config, configLoading, setIsLive, setStatus]);
 
   const connectPlatform = async (platform: ChatPlatform) => {
     setChatBusy((prev) => ({ ...prev, [platform]: true }));

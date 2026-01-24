@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadConfig, saveConfig, resetConfig } from "@/lib/config/configStore";
-import type { PartialConfig } from "@/lib/types/config";
+import { loadConfig, saveConfig, resetConfig } from "@/server/config";
+import type { PartialConfig } from "@/features/config/types";
 
 /**
  * GET /api/config - Load current configuration
