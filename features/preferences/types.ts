@@ -39,6 +39,10 @@ export type ChatDisplayPreferences = {
   messageLayout: MessageLayout;
   /** Text alignment */
   textAlign: TextAlign;
+  /** Highlight messages that mention the streamer */
+  highlightMentions: boolean;
+  /** Keywords to highlight in chat messages */
+  highlightKeywords: string[];
 };
 
 // --- Theme Preferences ---
@@ -81,6 +85,8 @@ export const DEFAULT_CHAT_PREFERENCES: ChatDisplayPreferences = {
   showThirdPartyEmotes: true,
   messageLayout: "inline",
   textAlign: "left",
+  highlightMentions: true,
+  highlightKeywords: [],
 };
 
 export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {

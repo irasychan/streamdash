@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { ChatMessage as ChatMessageType } from "../types/chat";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ChatMessage as ChatMessageType, ChatModerationAction, ChatHideEvent } from "../types/chat";
 import { ChatMessage, densityGapClasses } from "./ChatMessage";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { demoChatMessages } from "@/lib/demoData";
@@ -25,12 +25,15 @@ export function ChatContainer({
   const [messages, setMessages] = useState<ChatMessageType[]>(
     showDemo ? demoChatMessages : []
   );
+  const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
+  const [twitchAuthConnected, setTwitchAuthConnected] = useState(false);
+  const [twitchUserLogin, setTwitchUserLogin] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
   const { preferences } = usePreferences();
   const { loadEmotes } = useEmotes();
-  const { twitchUserId } = useChatStatus();
+  const { twitchUserId, twitchChannel } = useChatStatus();
   const chatPrefs = preferences.chat;
 
   // Load emotes when Twitch user ID becomes available
@@ -42,13 +45,47 @@ export function ChatContainer({
   }, [twitchUserId, loadEmotes]);
 
   useEffect(() => {
+    let active = true;
+
+    const fetchAuthStatus = async () => {
+      try {
+        const response = await fetch("/api/twitch/status");
+        const data = await response.json();
+        if (!active) return;
+        setTwitchAuthConnected(Boolean(data?.connected));
+        setTwitchUserLogin(data?.user ?? null);
+      } catch {
+        if (!active) return;
+        setTwitchAuthConnected(false);
+        setTwitchUserLogin(null);
+      }
+    };
+
+    fetchAuthStatus();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const eventSource = new EventSource("/api/chat/sse");
 
-    eventSource.onopen = () => {
+    eventSource.onopen = async () => {
       setConnected(true);
       // Clear demo messages when connected
       if (showDemo) {
         setMessages([]);
+      }
+      // Fetch initial hidden message list
+      try {
+        const response = await fetch("/api/chat/hide");
+        const data = await response.json();
+        if (data.ok && Array.isArray(data.data)) {
+          setHiddenMessageIds(new Set(data.data));
+        }
+      } catch {
+        // Ignore fetch errors
       }
     };
 
@@ -58,6 +95,21 @@ export function ChatContainer({
 
         // Skip keepalive messages
         if (data.type === "keepalive") {
+          return;
+        }
+
+        // Handle hide/unhide events
+        if (data.type === "hide" || data.type === "unhide") {
+          const hideEvent = data as ChatHideEvent;
+          setHiddenMessageIds((prev) => {
+            const next = new Set(prev);
+            if (hideEvent.type === "hide") {
+              next.add(hideEvent.messageId);
+            } else {
+              next.delete(hideEvent.messageId);
+            }
+            return next;
+          });
           return;
         }
 
@@ -94,6 +146,105 @@ export function ChatContainer({
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
     autoScrollRef.current = isAtBottom;
+  };
+
+  const handleModerate = useCallback(
+    async (message: ChatMessageType, action: ChatModerationAction) => {
+      if (message.platform !== "twitch") return;
+
+      const payload = {
+        platform: "twitch" as const,
+        action,
+        targetUserId: message.author.id,
+        durationSeconds: action === "timeout" ? 600 : undefined,
+        channel: twitchChannel,
+      };
+
+      try {
+        const response = await fetch("/api/chat/moderate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null);
+          console.error("[Chat Moderation] Failed:", data?.error ?? response.statusText);
+        }
+      } catch (error) {
+        console.error("[Chat Moderation] Error:", error);
+      }
+    },
+    [twitchChannel]
+  );
+
+  const handleHide = useCallback(async (message: ChatMessageType) => {
+    try {
+      const response = await fetch("/api/chat/hide", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: message.id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        console.error("[Chat Hide] Failed:", data?.error ?? response.statusText);
+      }
+    } catch (error) {
+      console.error("[Chat Hide] Error:", error);
+    }
+  }, []);
+
+  const handleUnhide = useCallback(async (message: ChatMessageType) => {
+    try {
+      const response = await fetch("/api/chat/hide", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: message.id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        console.error("[Chat Unhide] Failed:", data?.error ?? response.statusText);
+      }
+    } catch (error) {
+      console.error("[Chat Unhide] Error:", error);
+    }
+  }, []);
+
+  const highlightKeywords = (chatPrefs.highlightKeywords ?? [])
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
+
+  const mentionTargets = chatPrefs.highlightMentions
+    ? [twitchUserLogin, twitchChannel].filter((value): value is string => Boolean(value))
+    : [];
+
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const shouldHighlightMessage = (message: ChatMessageType) => {
+    if (message.isHighlighted) return true;
+
+    const content = message.content.toLowerCase();
+
+    if (highlightKeywords.length > 0) {
+      for (const keyword of highlightKeywords) {
+        if (content.includes(keyword.toLowerCase())) {
+          return true;
+        }
+      }
+    }
+
+    if (mentionTargets.length > 0) {
+      for (const mention of mentionTargets) {
+        const regex = new RegExp(`(^|\\s|@)${escapeRegExp(mention)}(\\b)`, "i");
+        if (regex.test(message.content)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   };
 
   return (
@@ -139,7 +290,16 @@ export function ChatContainer({
         ) : (
           <div className={densityGapClasses[chatPrefs.messageDensity]}>
             {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} chatPrefs={chatPrefs} />
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                chatPrefs={chatPrefs}
+                onModerate={twitchAuthConnected ? handleModerate : undefined}
+                onHide={handleHide}
+                onUnhide={handleUnhide}
+                isHighlighted={shouldHighlightMessage(msg)}
+                isHidden={hiddenMessageIds.has(msg.id)}
+              />
             ))}
           </div>
         )}

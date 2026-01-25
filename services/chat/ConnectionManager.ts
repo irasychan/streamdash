@@ -2,6 +2,7 @@ import type {
   ChatMessage,
   ChatPlatform,
   ChatConnectionStatus,
+  ChatHideEvent,
   SSEClient,
 } from "@/features/chat/types/chat";
 import { TwitchIRC } from "./bridges/TwitchIRC";
@@ -19,6 +20,7 @@ class ConnectionManager {
   private sseClients: Map<string, SSEClient> = new Map();
   private messageBuffer: ChatMessage[] = [];
   private messageIds: Set<string> = new Set();
+  private hiddenMessageIds: Set<string> = new Set();
 
   private twitchIRC: TwitchIRC | null = null;
   private youtubeMasterchat: YouTubeMasterchat | null = null;
@@ -83,6 +85,43 @@ class ConnectionManager {
 
   public getBuffer(): ChatMessage[] {
     return [...this.messageBuffer];
+  }
+
+  public hideMessage(messageId: string): void {
+    if (this.hiddenMessageIds.has(messageId)) {
+      return; // Already hidden
+    }
+    this.hiddenMessageIds.add(messageId);
+    this.broadcastHideEvent({ type: "hide", messageId });
+  }
+
+  public unhideMessage(messageId: string): void {
+    if (!this.hiddenMessageIds.has(messageId)) {
+      return; // Not hidden
+    }
+    this.hiddenMessageIds.delete(messageId);
+    this.broadcastHideEvent({ type: "unhide", messageId });
+  }
+
+  public isMessageHidden(messageId: string): boolean {
+    return this.hiddenMessageIds.has(messageId);
+  }
+
+  public getHiddenMessageIds(): string[] {
+    return [...this.hiddenMessageIds];
+  }
+
+  private broadcastHideEvent(event: ChatHideEvent): void {
+    for (const [clientId, client] of this.sseClients.entries()) {
+      try {
+        client.send(event);
+      } catch (error) {
+        console.error(
+          `Error sending SSE hide event to client ${clientId}:`,
+          error
+        );
+      }
+    }
   }
 
   // Twitch connection

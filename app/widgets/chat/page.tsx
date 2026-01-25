@@ -7,11 +7,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
 import { useEmotes } from "@/features/emotes/hooks/useEmotes";
-import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/features/chat/types/chat";
+import type { ChatMessage as ChatMessageType, ChatPlatform, ChatHideEvent } from "@/features/chat/types/chat";
 import type { ChatDisplayPreferences, FontSize, MessageDensity, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
+  const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
@@ -152,15 +153,44 @@ function ChatWidgetContent() {
   useEffect(() => {
     const eventSource = new EventSource("/api/chat/sse");
 
-    eventSource.onopen = () => {
+    eventSource.onopen = async () => {
       setConnected(true);
       setMessages([]);
+      // Fetch initial hidden message list
+      try {
+        const response = await fetch("/api/chat/hide");
+        const data = await response.json();
+        if (data.ok && Array.isArray(data.data)) {
+          setHiddenMessageIds(new Set(data.data));
+        }
+      } catch {
+        // Ignore fetch errors
+      }
     };
 
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "keepalive") return;
+
+        // Handle hide/unhide events
+        if (data.type === "hide" || data.type === "unhide") {
+          const hideEvent = data as ChatHideEvent;
+          setHiddenMessageIds((prev) => {
+            const next = new Set(prev);
+            if (hideEvent.type === "hide") {
+              next.add(hideEvent.messageId);
+            } else {
+              next.delete(hideEvent.messageId);
+            }
+            return next;
+          });
+          // Remove hidden message from display
+          if (hideEvent.type === "hide") {
+            setMessages((prev) => prev.filter((msg) => msg.id !== hideEvent.messageId));
+          }
+          return;
+        }
 
         const message = data as ChatMessageType;
 
@@ -196,6 +226,12 @@ function ChatWidgetContent() {
     autoScrollRef.current = scrollHeight - scrollTop - clientHeight < 50;
   };
 
+  // Filter out hidden messages for display
+  const visibleMessages = useMemo(
+    () => messages.filter((msg) => !hiddenMessageIds.has(msg.id)),
+    [messages, hiddenMessageIds]
+  );
+
   return (
     <Card
       className={
@@ -211,7 +247,7 @@ function ChatWidgetContent() {
           className="h-[calc(100vh-2rem)] overflow-y-auto p-3 space-y-0.5"
           style={{ scrollbarWidth: "thin" }}
         >
-          {messages.map((msg) => (
+          {visibleMessages.map((msg) => (
             <ChatMessage
               key={msg.id}
               message={msg}

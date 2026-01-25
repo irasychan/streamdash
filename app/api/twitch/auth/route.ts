@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-const scopes = ["moderator:read:followers", "chat:read", "chat:edit"].join(" ");
+const scopes = [
+  "moderator:read:followers",
+  "moderator:manage:banned_users",
+  "chat:read",
+  "chat:edit",
+].join(" ");
 
 export async function GET(request: Request) {
   const clientId = process.env.TWITCH_CLIENT_ID;

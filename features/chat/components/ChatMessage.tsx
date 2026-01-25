@@ -1,7 +1,8 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import Image from "next/image";
-import type { ChatMessage as ChatMessageType } from "../types/chat";
+import type { ChatMessage as ChatMessageType, ChatModerationAction } from "../types/chat";
 import type { ChatDisplayPreferences, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/ui/cn";
@@ -14,6 +15,11 @@ type ChatMessageProps = {
   className?: string;
   chatPrefs?: Partial<ChatDisplayPreferences>;
   animation?: MessageAnimation;
+  onModerate?: (message: ChatMessageType, action: ChatModerationAction) => void;
+  onHide?: (message: ChatMessageType) => void;
+  onUnhide?: (message: ChatMessageType) => void;
+  isHighlighted?: boolean;
+  isHidden?: boolean;
 };
 
 // Font size classes
@@ -82,6 +88,11 @@ export function ChatMessage({
   className,
   chatPrefs,
   animation = "none",
+  onModerate,
+  onHide,
+  onUnhide,
+  isHighlighted,
+  isHidden = false,
 }: ChatMessageProps) {
   const { author, content, platform, emotes, isModerator, isSubscriber } = message;
   const { emotes: thirdPartyEmotes } = useEmotes();
@@ -97,25 +108,98 @@ export function ChatMessage({
   const messageLayout = chatPrefs?.messageLayout ?? "inline";
   const textAlign = chatPrefs?.textAlign ?? "left";
 
+  const highlighted = isHighlighted ?? message.isHighlighted;
+  const showModerationControls = Boolean(onModerate) && platform === "twitch";
+  const showHideControls = Boolean(onHide) || Boolean(onUnhide);
+
+  const handleModerate = (action: ChatModerationAction) => (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onModerate?.(message, action);
+  };
+
+  const handleHide = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onHide?.(message);
+  };
+
+  const handleUnhide = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onUnhide?.(message);
+  };
+
+  const actionButtons = (showModerationControls || showHideControls) ? (
+    <div className="pointer-events-auto absolute right-2 top-1 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      {showHideControls && !isHidden && (
+        <button
+          type="button"
+          onClick={handleHide}
+          className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300 ring-1 ring-slate-400/30 bg-slate-400/10 hover:bg-slate-400/20"
+          title="Hide from OBS widget"
+        >
+          Hide
+        </button>
+      )}
+      {showHideControls && isHidden && (
+        <button
+          type="button"
+          onClick={handleUnhide}
+          className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-400/30 bg-emerald-400/10 hover:bg-emerald-400/20"
+          title="Show in OBS widget again"
+        >
+          Unhide
+        </button>
+      )}
+      {showModerationControls && (
+        <>
+          <button
+            type="button"
+            onClick={handleModerate("timeout")}
+            className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300 ring-1 ring-amber-400/30 bg-amber-400/10 hover:bg-amber-400/20"
+            title="Timeout user"
+          >
+            Timeout
+          </button>
+          <button
+            type="button"
+            onClick={handleModerate("ban")}
+            className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-300 ring-1 ring-rose-400/30 bg-rose-400/10 hover:bg-rose-400/20"
+            title="Ban user"
+          >
+            Ban
+          </button>
+        </>
+      )}
+    </div>
+  ) : null;
+
   const isStacked = messageLayout === "stacked";
   const isInlineWrap = messageLayout === "inline-wrap";
+
+  const hasActionButtons = showModerationControls || showHideControls;
 
   // inline-wrap: everything flows in a single wrapping line
   if (isInlineWrap) {
     return (
       <div
         className={cn(
-          "group rounded-md transition-colors",
+          "group relative rounded-md transition-colors",
           "hover:bg-white/[0.03]",
-          isModerator && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
+          highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
+          isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
+          isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
           fontSizeClasses[fontSize],
           densityClasses[density],
           textAlignClasses[textAlign],
           animationClasses[animation],
+          hasActionButtons && "pr-24",
           className
         )}
         style={fontFamily ? { fontFamily } : undefined}
       >
+        {actionButtons}
         <span className="inline">
           {showPlatform && (
             <span className="inline-flex align-middle mr-1.5">
@@ -181,18 +265,22 @@ export function ChatMessage({
   return (
     <div
       className={cn(
-        "group flex rounded-md transition-colors",
+        "group relative flex rounded-md transition-colors",
         "hover:bg-white/[0.03]",
-        isModerator && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
+        highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
+        isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
+        isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
         fontSizeClasses[fontSize],
         densityClasses[density],
         isStacked ? "flex-col gap-0.5" : "items-start gap-2.5",
         textAlignClasses[textAlign],
         animationClasses[animation],
+        hasActionButtons && "pr-24",
         className
       )}
       style={fontFamily ? { fontFamily } : undefined}
     >
+      {actionButtons}
       {/* Header row: platform badge, avatar, username, badges */}
       <div
         className={cn(
