@@ -54,6 +54,10 @@ export function generateChatWidgetUrl(
     params.set("fontSize", config.fontSize);
   }
 
+  if (config.messageDensity !== defaults.messageDensity) {
+    params.set("messageDensity", config.messageDensity);
+  }
+
   if (config.showAvatars !== defaults.showAvatars) {
     params.set("showAvatars", config.showAvatars.toString());
   }

@@ -26,6 +26,8 @@ export type ChatWidgetConfig = {
   discordChannelId: string;
   /** Font size: small, medium, large */
   fontSize: "small" | "medium" | "large";
+  /** Message density/spacing */
+  messageDensity: "compact" | "comfortable" | "spacious";
   /** Show user avatars */
   showAvatars: boolean;
   /** Show badges (mod, sub, etc.) */
@@ -112,6 +114,7 @@ export const DEFAULT_CHAT_WIDGET_CONFIG: ChatWidgetConfig = {
   liveChatId: "",
   discordChannelId: "",
   fontSize: "medium",
+  messageDensity: "comfortable",
   showAvatars: false,
   showBadges: true,
   animation: "fade",

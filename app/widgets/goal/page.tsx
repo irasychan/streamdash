@@ -16,6 +16,10 @@ function GoalWidgetContent() {
     () => searchParams.get("channel") ?? demoStats.channel,
     [searchParams]
   );
+  const transparent = useMemo(
+    () => searchParams.get("transparent") === "true",
+    [searchParams]
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -55,7 +59,13 @@ function GoalWidgetContent() {
   );
 
   return (
-    <Card className="border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]">
+    <Card
+      className={
+        transparent
+          ? "border-0 bg-transparent shadow-none"
+          : "border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]"
+      }
+    >
       <CardContent className="pt-5 pb-4">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Follower sprint
@@ -89,12 +99,21 @@ function GoalWidgetSkeleton() {
   );
 }
 
+function GoalWidgetWrapper() {
+  const searchParams = useSearchParams();
+  const transparent = searchParams.get("transparent") === "true";
+
+  return (
+    <main className={transparent ? "p-0" : "p-6"}>
+      <GoalWidgetContent />
+    </main>
+  );
+}
+
 export default function GoalWidget() {
   return (
-    <main className="p-6">
-      <Suspense fallback={<GoalWidgetSkeleton />}>
-        <GoalWidgetContent />
-      </Suspense>
-    </main>
+    <Suspense fallback={<GoalWidgetSkeleton />}>
+      <GoalWidgetWrapper />
+    </Suspense>
   );
 }

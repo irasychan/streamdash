@@ -156,24 +156,46 @@ export function ChatWidgetConfigForm({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="animation">Message Animation</Label>
-          <Select
-            value={config.animation}
-            onValueChange={(value: "none" | "fade" | "slide") =>
-              onChange({ animation: value })
-            }
-            disabled={disabled}
-          >
-            <SelectTrigger id="animation" className="w-full sm:w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="fade">Fade In</SelectItem>
-              <SelectItem value="slide">Slide In</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="message-density">Message Spacing</Label>
+            <Select
+              value={config.messageDensity}
+              onValueChange={(value: "compact" | "comfortable" | "spacious") =>
+                onChange({ messageDensity: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="message-density">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="compact">Compact</SelectItem>
+                <SelectItem value="comfortable">Comfortable</SelectItem>
+                <SelectItem value="spacious">Spacious</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="animation">Message Animation</Label>
+            <Select
+              value={config.animation}
+              onValueChange={(value: "none" | "fade" | "slide") =>
+                onChange({ animation: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="animation">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="fade">Fade In</SelectItem>
+                <SelectItem value="slide">Slide In</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

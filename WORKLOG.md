@@ -105,6 +105,72 @@ Reduced context provider nesting by migrating to Zustand.
 - [x] Remove provider nesting from layouts
 - [x] Test SSR compatibility (build passes)
 
+### Widget Transparent Background Fix
+**Priority:** Medium
+**Status:** Complete
+
+Widget backgrounds are now transparent when loaded as OBS browser sources with `?transparent=true`.
+
+**What was done:**
+- Created `app/widgets/layout.tsx` - Applies transparent body styles when `transparent=true` param is set
+- Added `.widget-transparent` CSS class in `globals.css` to override body background and `::before` gradient
+- Updated all widget pages (chat, goal, stats) to support `transparent=true` URL param
+- When transparent: removes Card backgrounds/borders/shadows, removes main padding
+
+**Usage:**
+```
+/widgets/chat?transparent=true&twitchChannel=yourChannel
+/widgets/goal?transparent=true&channel=yourChannel
+/widgets/stats?transparent=true&channel=yourChannel
+```
+
+- [x] Investigate current background styles on widget pages
+- [x] Ensure `background: transparent` is applied correctly
+- [x] Test in OBS browser source
+
+### Widget URL Param & Config Fixes
+**Priority:** Medium
+**Status:** Complete
+
+Fixed widget configuration URL generation and param handling.
+
+**What was done:**
+- Added `messageDensity` (Message Spacing) option to chat widget config
+- Fixed `showAvatars` default mismatch between widget config (`false`) and ChatMessage fallback
+- Updated chat widget page to read all display prefs from URL: `fontSize`, `messageDensity`, `showAvatars`, `showBadges`
+- Fixed Tailwind config to scan `features/` directory (platform badge colors were being purged)
+- Fixed Select component dropdown background (was transparent, now solid)
+
+**URL params now supported:**
+```
+/widgets/chat?fontSize=small&messageDensity=compact&showAvatars=true&showBadges=false&transparent=true
+```
+
+- [x] Add messageDensity to ChatWidgetConfig type and defaults
+- [x] Add Message Spacing selector to widget config form
+- [x] Update URL generator for messageDensity param
+- [x] Fix showAvatars default mismatch
+- [x] Add features/ to Tailwind content paths
+- [x] Fix Select dropdown background
+
+### Settings Page Redesign
+**Priority:** Low
+**Status:** Complete
+
+Redesigned settings page with Monkeytype-inspired minimal UI.
+
+**What was done:**
+- Removed Appearance section (preferences now per-widget via URL params)
+- Created collapsible Section component with chevron icons
+- Created SettingRow component (label + description left, controls right)
+- Created PillButton component for save/reset actions
+- Sections: twitch, youtube, discord, goals, environment (collapsed), danger zone (collapsed)
+
+- [x] Research Monkeytype settings design
+- [x] Remove duplicate Appearance section
+- [x] Implement collapsible sections
+- [x] Style with minimal borders and pill buttons
+
 ### Widget Preview in Dashboard
 **Priority:** Medium
 **Status:** Pending

@@ -24,6 +24,10 @@ function StatsWidgetContent() {
     () => searchParams.get("youtubeHandle") ?? searchParams.get("handle") ?? "",
     [searchParams]
   );
+  const transparent = useMemo(
+    () => searchParams.get("transparent") === "true",
+    [searchParams]
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -65,7 +69,13 @@ function StatsWidgetContent() {
   }, [channel, youtubeChannelId, youtubeHandle]);
 
   return (
-    <Card className="border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]">
+    <Card
+      className={
+        transparent
+          ? "border-0 bg-transparent shadow-none"
+          : "border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]"
+      }
+    >
       <CardContent className="pt-5 pb-4">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Stream pulse
@@ -125,12 +135,21 @@ function StatsWidgetSkeleton() {
   );
 }
 
+function StatsWidgetWrapper() {
+  const searchParams = useSearchParams();
+  const transparent = searchParams.get("transparent") === "true";
+
+  return (
+    <main className={transparent ? "p-0" : "p-6"}>
+      <StatsWidgetContent />
+    </main>
+  );
+}
+
 export default function StatsWidget() {
   return (
-    <main className="p-6">
-      <Suspense fallback={<StatsWidgetSkeleton />}>
-        <StatsWidgetContent />
-      </Suspense>
-    </main>
+    <Suspense fallback={<StatsWidgetSkeleton />}>
+      <StatsWidgetWrapper />
+    </Suspense>
   );
 }
