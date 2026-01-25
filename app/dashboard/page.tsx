@@ -39,7 +39,7 @@ export default function DashboardPage() {
   });
   // Local input state - initialized from persistent config
   const [twitchChannel, setTwitchChannel] = useState("");
-  const [youtubeLiveChatId, setYoutubeLiveChatId] = useState("");
+  const [youtubeVideoId, setYoutubeVideoId] = useState("");
   const [discordChannelId, setDiscordChannelId] = useState("");
   const [configInitialized, setConfigInitialized] = useState(false);
 
@@ -47,7 +47,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!configLoading && !configInitialized) {
       setTwitchChannel(config.platforms.twitch.defaultChannel || demoStats.channel);
-      setYoutubeLiveChatId(config.platforms.youtube.defaultLiveChatId || "");
+      setYoutubeVideoId(config.platforms.youtube.defaultVideoId || "");
       setDiscordChannelId(config.platforms.discord.defaultChannelId || "");
       setConfigInitialized(true);
     }
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         body = { platform, channel: twitchChannel };
       }
       if (platform === "youtube") {
-        body = { platform, liveChatId: youtubeLiveChatId };
+        body = { platform, videoId: youtubeVideoId };
       }
       if (platform === "discord") {
         body = { platform, channelId: discordChannelId };
@@ -361,9 +361,9 @@ export default function DashboardPage() {
               </div>
               <div className="mt-3 space-y-2">
                 <input
-                  value={youtubeLiveChatId}
-                  onChange={(event) => setYoutubeLiveChatId(event.target.value)}
-                  placeholder="live_chat_id"
+                  value={youtubeVideoId}
+                  onChange={(event) => setYoutubeVideoId(event.target.value)}
+                  placeholder="Video ID or URL (e.g., dQw4w9WgXcQ)"
                   className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <div className="flex items-center gap-2">
@@ -381,7 +381,7 @@ export default function DashboardPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => connectPlatform("youtube")}
-                      disabled={!youtubeLiveChatId || chatBusy.youtube}
+                      disabled={!youtubeVideoId || chatBusy.youtube}
                     >
                       {chatBusy.youtube ? "..." : "Connect"}
                     </Button>
@@ -391,9 +391,7 @@ export default function DashboardPage() {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  <Link href="/api/youtube/auth" className="text-primary hover:underline">
-                    Connect YouTube auth
-                  </Link>
+                  No auth required - just paste a live stream URL
                 </p>
               </div>
             </div>

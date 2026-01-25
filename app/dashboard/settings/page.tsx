@@ -165,8 +165,8 @@ function SettingsForm({
   const [youtubeChannelId, setYoutubeChannelId] = useState(
     () => config.platforms.youtube.defaultChannelId
   );
-  const [youtubeLiveChatId, setYoutubeLiveChatId] = useState(
-    () => config.platforms.youtube.defaultLiveChatId
+  const [youtubeVideoId, setYoutubeVideoId] = useState(
+    () => config.platforms.youtube.defaultVideoId
   );
   const [discordChannelId, setDiscordChannelId] = useState(
     () => config.platforms.discord.defaultChannelId
@@ -181,7 +181,7 @@ function SettingsForm({
         twitch: { defaultChannel: twitchChannel },
         youtube: {
           defaultChannelId: youtubeChannelId,
-          defaultLiveChatId: youtubeLiveChatId,
+          defaultVideoId: youtubeVideoId,
         },
         discord: { defaultChannelId: discordChannelId },
       },
@@ -198,7 +198,7 @@ function SettingsForm({
   const hasChanges =
     twitchChannel !== config.platforms.twitch.defaultChannel ||
     youtubeChannelId !== config.platforms.youtube.defaultChannelId ||
-    youtubeLiveChatId !== config.platforms.youtube.defaultLiveChatId ||
+    youtubeVideoId !== config.platforms.youtube.defaultVideoId ||
     discordChannelId !== config.platforms.discord.defaultChannelId ||
     followerTarget !== config.goals.followerTarget.toString();
 
@@ -261,27 +261,15 @@ function SettingsForm({
         </SettingRow>
 
         <SettingRow
-          label="live chat id"
-          description="The live chat ID changes for each stream. Get it from your YouTube live dashboard."
+          label="video id / url"
+          description="Enter a YouTube video ID or full URL. No OAuth required with masterchat."
         >
           <SettingInput
-            value={youtubeLiveChatId}
-            onChange={setYoutubeLiveChatId}
-            placeholder="live chat id"
+            value={youtubeVideoId}
+            onChange={setYoutubeVideoId}
+            placeholder="dQw4w9WgXcQ or https://youtube.com/watch?v=..."
             disabled={loading}
           />
-        </SettingRow>
-
-        <SettingRow
-          label="oauth connection"
-          description="Required for live chat access."
-        >
-          <Link
-            href="/api/youtube/auth"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-border/50 rounded-md text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-          >
-            connect
-          </Link>
         </SettingRow>
       </Section>
 
@@ -387,7 +375,7 @@ export default function SettingsPage() {
   const formKey = [
     config.platforms.twitch.defaultChannel,
     config.platforms.youtube.defaultChannelId,
-    config.platforms.youtube.defaultLiveChatId,
+    config.platforms.youtube.defaultVideoId,
     config.platforms.discord.defaultChannelId,
     config.goals.followerTarget,
   ].join("|");

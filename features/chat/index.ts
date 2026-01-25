@@ -6,7 +6,7 @@ export * from "./types/chat";
 // Services (from top-level services/)
 export { connectionManager } from "@/services/chat/ConnectionManager";
 export { TwitchIRC } from "@/services/chat/bridges/TwitchIRC";
-export { YouTubePoller } from "@/services/chat/bridges/YouTubePoller";
+export { YouTubeMasterchat } from "@/services/chat/bridges/YouTubeMasterchat";
 export { DiscordBridge } from "@/services/chat/bridges/DiscordBridge";
 
 // Hooks

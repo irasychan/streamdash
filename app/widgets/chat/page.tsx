@@ -100,18 +100,14 @@ function ChatWidgetContent() {
       }
 
       if (youtubeVideoId) {
-        // Would need to get liveChatId from video first
-        // For now, assume it's passed directly
-        const liveChatId = searchParams.get("liveChatId");
-        if (liveChatId) {
-          connections.push(
-            fetch("/api/chat/connect", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ platform: "youtube", liveChatId }),
-            })
-          );
-        }
+        // masterchat accepts video ID or URL directly - no liveChatId needed
+        connections.push(
+          fetch("/api/chat/connect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ platform: "youtube", videoId: youtubeVideoId }),
+          })
+        );
       }
 
       if (discordChannelId) {

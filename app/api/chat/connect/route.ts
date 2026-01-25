@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { connectionManager } from "@/services/chat/ConnectionManager";
-import {
-  loadYouTubeToken,
-  saveYouTubeToken,
-} from "@/features/chat/utils/youtubeTokenStore";
 import type { ChatPlatform } from "@/features/chat/types/chat";
 
 export const dynamic = "force-dynamic";
@@ -13,14 +9,14 @@ export const runtime = "nodejs";
 type ConnectRequest = {
   platform: ChatPlatform;
   channel?: string;
-  liveChatId?: string;
-  channelId?: string;
+  videoId?: string; // For YouTube - accepts video ID or URL
+  channelId?: string; // For Discord
 };
 
 export async function POST(request: Request) {
   try {
     const body: ConnectRequest = await request.json();
-    const { platform, channel, liveChatId, channelId } = body;
+    const { platform, channel, videoId, channelId } = body;
 
     const validPlatforms = ["twitch", "youtube", "discord"] as const;
     if (!platform || !validPlatforms.includes(platform)) {
@@ -53,87 +49,28 @@ export async function POST(request: Request) {
       }
 
       case "youtube": {
-        if (!liveChatId) {
+        if (!videoId) {
           return NextResponse.json(
-            { ok: false, error: "liveChatId is required for YouTube" },
+            { ok: false, error: "videoId is required for YouTube" },
             { status: 400 }
           );
         }
 
-        const cookieStore = await cookies();
-        const storedToken = await loadYouTubeToken();
-        const accessToken =
-          cookieStore.get("youtube_access_token")?.value ?? storedToken?.accessToken;
-        const refreshToken =
-          cookieStore.get("youtube_refresh_token")?.value ?? storedToken?.refreshToken;
-        const expiresAt = cookieStore.get("youtube_token_expires")?.value;
-        const storedExpiresAt = storedToken?.expiresAt
-          ? storedToken.expiresAt.toString()
-          : undefined;
+        // masterchat doesn't require OAuth - it uses YouTube's internal protocol
+        await connectionManager.connectYouTube(videoId);
 
-        const { token, updatedToken } = await getYouTubeAccessToken({
-          accessToken,
-          refreshToken,
-          expiresAt: expiresAt ?? storedExpiresAt,
-        });
+        const metadata = connectionManager.getYouTubeMetadata();
 
-        if (!token) {
-          return NextResponse.json(
-            { ok: false, error: "YouTube authentication required" },
-            { status: 401 }
-          );
-        }
-
-        const tokenExpiresAt = expiresAt ? Number(expiresAt) : undefined;
-        const resolvedExpiresAt =
-          updatedToken?.expiresAt ??
-          (Number.isNaN(tokenExpiresAt) ? undefined : tokenExpiresAt);
-        await connectionManager.connectYouTube(liveChatId, {
-          accessToken: token,
-          refreshToken: updatedToken?.refreshToken ?? refreshToken,
-          expiresAt: resolvedExpiresAt,
-        });
-
-        if (resolvedExpiresAt) {
-          await saveYouTubeToken({
-            accessToken: token,
-            refreshToken: updatedToken?.refreshToken ?? refreshToken ?? undefined,
-            expiresAt: resolvedExpiresAt,
-          });
-        }
-
-        const response = NextResponse.json({
+        return NextResponse.json({
           ok: true,
-          data: { platform: "youtube", liveChatId, connected: true },
+          data: {
+            platform: "youtube",
+            videoId,
+            connected: true,
+            title: metadata?.title,
+            channelName: metadata?.channelName,
+          },
         });
-
-        if (updatedToken) {
-          response.cookies.set("youtube_access_token", updatedToken.accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax",
-            path: "/",
-            maxAge: updatedToken.expiresIn,
-          });
-          response.cookies.set("youtube_token_expires", updatedToken.expiresAt.toString(), {
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 30,
-          });
-          if (updatedToken.refreshToken) {
-            response.cookies.set("youtube_refresh_token", updatedToken.refreshToken, {
-              httpOnly: true,
-              secure: true,
-              sameSite: "lax",
-              path: "/",
-              maxAge: 60 * 60 * 24 * 30,
-            });
-          }
-        }
-
-        return response;
       }
 
       case "discord": {
@@ -170,75 +107,19 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("[Chat Connect] Error:", error);
+
+    // Check if it's a YouTube-specific error
+    const youtubeError = connectionManager.getYouTubeError();
+    if (youtubeError) {
+      return NextResponse.json(
+        { ok: false, error: youtubeError.message, code: youtubeError.code },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { ok: false, error: "Failed to connect" },
       { status: 500 }
     );
   }
-}
-
-type YouTubeTokenState = {
-  accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: string;
-};
-
-type YouTubeTokenUpdate = {
-  accessToken: string;
-  refreshToken?: string;
-  expiresIn: number;
-  expiresAt: number;
-};
-
-async function getYouTubeAccessToken(state: YouTubeTokenState) {
-  if (!state.accessToken) {
-    return { token: null, updatedToken: null };
-  }
-
-  if (!state.expiresAt) {
-    return { token: state.accessToken, updatedToken: null };
-  }
-
-  const expiresAt = Number(state.expiresAt);
-  if (Number.isNaN(expiresAt) || Date.now() < expiresAt - 60_000) {
-    return { token: state.accessToken, updatedToken: null };
-  }
-
-  if (!state.refreshToken) {
-    return { token: null, updatedToken: null };
-  }
-
-  const clientId = process.env.YOUTUBE_CLIENT_ID;
-  const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    return { token: null, updatedToken: null };
-  }
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    client_secret: clientSecret,
-    grant_type: "refresh_token",
-    refresh_token: state.refreshToken,
-  });
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: params.toString(),
-  });
-
-  if (!response.ok) {
-    return { token: null, updatedToken: null };
-  }
-
-  const payload = await response.json();
-  const updatedToken: YouTubeTokenUpdate = {
-    accessToken: payload.access_token,
-    refreshToken: payload.refresh_token,
-    expiresIn: payload.expires_in,
-    expiresAt: Date.now() + payload.expires_in * 1000,
-  };
-
-  return { token: updatedToken.accessToken, updatedToken };
 }
