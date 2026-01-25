@@ -2,6 +2,44 @@
 
 ## Recently Completed
 
+### Widget Config Card UX Improvements (Jan 25, 2026)
+**Status:** Complete
+
+Small UX improvements to the widget configuration cards.
+
+**Changes:**
+- Copy URL now includes full host (e.g., `http://localhost:3000/widgets/chat?...`)
+- Added recommended OBS browser source size for each widget:
+  - Chat Overlay: `400x600`
+  - Follower Goal: `400x100`
+  - Stream Stats: `400x100`
+
+**Files Modified:**
+- `features/widgets/components/WidgetConfigCard.tsx` - Full URL display, `recommendedSize` prop
+- `app/dashboard/widgets/page.tsx` - Added `recommendedSize` to each widget card
+
+---
+
+### Widget Preview in Dashboard (Jan 25, 2026)
+**Status:** Complete
+
+Added live iframe previews to all widget config cards in the dashboard.
+
+**Features:**
+- `WidgetPreview` component with refresh, expand/collapse, and open-in-new-tab buttons
+- `WidgetConfigCard` wrapper with Storybook-style side-by-side layout (controls left, preview right)
+- Checkered background (`widget-preview-bg`) to visualize transparency
+- Aspect ratio support: "chat" (tall 2:3), "banner" (wide 4:1), or custom ratios
+- Show/hide preview toggle on desktop
+- Preview auto-updates as config changes
+
+**Files:**
+- `features/widgets/components/WidgetPreview.tsx` - Iframe preview component
+- `features/widgets/components/WidgetConfigCard.tsx` - Config card wrapper with preview integration
+- `app/globals.css` - Checkered background style
+
+---
+
 ### Chat Widget Layout & Animation Enhancements (Jan 25, 2026)
 **Status:** Complete
 
@@ -74,15 +112,6 @@ Archived to `worklogs/2026-01-25.md`:
 ---
 
 ## Active Tasks
-
-### Widget Preview in Dashboard
-**Priority:** Medium
-**Status:** Pending
-
-- [ ] Add live iframe preview in the config cards
-- [ ] Show chat widget preview
-- [ ] Show goal widget preview
-- [ ] Show stats widget preview
 
 ### Stream Analytics
 **Priority:** Low

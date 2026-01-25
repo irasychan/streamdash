@@ -107,6 +107,8 @@ export default function WidgetsPage() {
           description="Unified chat from Twitch, YouTube, and Discord"
           icon={<MessageSquare className="h-5 w-5 text-primary" />}
           previewUrl={chatUrl}
+          previewAspect="chat"
+          recommendedSize="400x600"
         >
           <ChatWidgetConfigForm
             config={chatConfig}
@@ -121,6 +123,8 @@ export default function WidgetsPage() {
           description="Show progress towards your follower target"
           icon={<Eye className="h-5 w-5 text-primary" />}
           previewUrl={goalUrl}
+          previewAspect="banner"
+          recommendedSize="400x100"
         >
           <GoalWidgetConfigForm
             config={goalConfig}
@@ -135,6 +139,8 @@ export default function WidgetsPage() {
           description="Display live viewer count, followers, and YouTube subs"
           icon={<BarChart3 className="h-5 w-5 text-primary" />}
           previewUrl={statsUrl}
+          previewAspect="banner"
+          recommendedSize="400x100"
         >
           <StatsWidgetConfigForm
             config={statsConfig}
