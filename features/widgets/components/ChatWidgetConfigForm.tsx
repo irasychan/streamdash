@@ -181,7 +181,7 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="animation">Message Animation</Label>
             <Select
               value={config.animation}
-              onValueChange={(value: "none" | "fade" | "slide") =>
+              onValueChange={(value: "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce") =>
                 onChange({ animation: value })
               }
               disabled={disabled}
@@ -192,7 +192,54 @@ export function ChatWidgetConfigForm({
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
                 <SelectItem value="fade">Fade In</SelectItem>
-                <SelectItem value="slide">Slide In</SelectItem>
+                <SelectItem value="slide-left">Slide from Left</SelectItem>
+                <SelectItem value="slide-right">Slide from Right</SelectItem>
+                <SelectItem value="slide-up">Slide from Bottom</SelectItem>
+                <SelectItem value="slide-down">Slide from Top</SelectItem>
+                <SelectItem value="scale">Scale In</SelectItem>
+                <SelectItem value="bounce">Bounce In</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="message-layout">Message Layout</Label>
+            <Select
+              value={config.messageLayout}
+              onValueChange={(value: "inline" | "inline-wrap" | "stacked") =>
+                onChange({ messageLayout: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="message-layout">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="inline">Inline (two columns)</SelectItem>
+                <SelectItem value="inline-wrap">Inline Wrap (natural flow)</SelectItem>
+                <SelectItem value="stacked">Stacked (name on top)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="text-align">Text Alignment</Label>
+            <Select
+              value={config.textAlign}
+              onValueChange={(value: "left" | "center" | "right") =>
+                onChange({ textAlign: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="text-align">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="left">Left</SelectItem>
+                <SelectItem value="center">Center</SelectItem>
+                <SelectItem value="right">Right</SelectItem>
               </SelectContent>
             </Select>
           </div>

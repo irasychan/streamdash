@@ -70,6 +70,14 @@ export function generateChatWidgetUrl(
     params.set("animation", config.animation);
   }
 
+  if (config.messageLayout !== defaults.messageLayout) {
+    params.set("messageLayout", config.messageLayout);
+  }
+
+  if (config.textAlign !== defaults.textAlign) {
+    params.set("textAlign", config.textAlign);
+  }
+
   const queryString = params.toString();
   return `/widgets/chat${queryString ? `?${queryString}` : ""}`;
 }
