@@ -178,6 +178,14 @@ Chat widget (`/widgets/chat`):
 Add any widget URL as a Browser Source in OBS. For transparency, use the chat
 widget with `transparent=true` and set OBS background color to transparent.
 
+Recommended browser source dimensions:
+
+| Widget | Size |
+|--------|------|
+| Chat Overlay | 400x600 |
+| Follower Goal | 400x100 |
+| Stream Stats | 400x100 |
+
 ## Credits
 
 - [masterchat](https://github.com/holodata/masterchat) - YouTube live chat without API limits

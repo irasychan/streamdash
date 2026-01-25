@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,8 +8,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, MonitorPlay, Copy, Check, Settings2 } from "lucide-react";
+import { ChevronDown, Copy, Check, Settings2, PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/ui/cn";
+import { WidgetPreview } from "./WidgetPreview";
 
 type WidgetConfigCardProps = {
   title: string;
@@ -17,6 +18,10 @@ type WidgetConfigCardProps = {
   icon: ReactNode;
   previewUrl: string;
   children: ReactNode;
+  /** Aspect ratio for preview: "chat" (tall), "banner" (wide), or custom like "16:9" */
+  previewAspect?: "chat" | "banner" | string;
+  /** Recommended OBS browser source size, e.g. "400x600" */
+  recommendedSize?: string;
   onCopyUrl?: () => void;
 };
 
@@ -26,13 +31,23 @@ export function WidgetConfigCard({
   icon,
   previewUrl,
   children,
+  previewAspect = "chat",
+  recommendedSize,
   onCopyUrl,
 }: WidgetConfigCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [origin, setOrigin] = useState("");
+
+  // Get origin on client side
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const fullUrl = origin + previewUrl;
 
   const handleCopy = () => {
-    const fullUrl = window.location.origin + previewUrl;
     navigator.clipboard.writeText(fullUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -69,40 +84,92 @@ export function WidgetConfigCard({
         </CardHeader>
 
         <CollapsibleContent>
-          <CardContent className="space-y-4 border-t border-border/40 pt-4">
-            {children}
-
-            {/* Generated URL */}
-            <div className="rounded-md bg-muted/30 p-3">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">
-                OBS Browser Source URL
-              </p>
-              <code className="block break-all text-xs text-foreground/80">
-                {previewUrl}
-              </code>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <a href={previewUrl} target="_blank" rel="noreferrer">
-                  <MonitorPlay className="mr-2 h-4 w-4" />
-                  Preview
-                </a>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleCopy}>
-                {copied ? (
-                  <>
-                    <Check className="mr-2 h-4 w-4 text-emerald-500" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy URL
-                  </>
+          <CardContent className="border-t border-border/40 pt-4">
+            {/* Storybook-style side-by-side layout */}
+            <div className="flex flex-col gap-4 lg:flex-row">
+              {/* Controls panel (left side) */}
+              <div
+                className={cn(
+                  "flex-1 space-y-4 transition-all duration-300",
+                  showPreview ? "lg:max-w-[50%]" : "lg:max-w-full"
                 )}
-              </Button>
+              >
+                {/* Toggle preview button (desktop) */}
+                <div className="hidden items-center justify-between lg:flex">
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Controls
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs"
+                    onClick={() => setShowPreview(!showPreview)}
+                  >
+                    {showPreview ? (
+                      <>
+                        <PanelLeftClose className="h-3.5 w-3.5" />
+                        Hide Preview
+                      </>
+                    ) : (
+                      <>
+                        <PanelLeft className="h-3.5 w-3.5" />
+                        Show Preview
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Config form */}
+                <div className="max-h-[500px] overflow-y-auto pr-2">
+                  {children}
+                </div>
+
+                {/* Generated URL */}
+                <div className="rounded-md bg-muted/30 p-3">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    OBS Browser Source URL
+                  </p>
+                  <code className="block break-all text-xs text-foreground/80">
+                    {fullUrl}
+                  </code>
+                  {recommendedSize && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Recommended size: <span className="font-mono text-foreground/80">{recommendedSize}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Copy URL button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="w-full sm:w-auto"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4 text-emerald-500" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy URL
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Preview panel (right side) */}
+              {showPreview && (
+                <div className="flex-1 overflow-hidden rounded-lg border border-border/40 lg:max-w-[50%]">
+                  <WidgetPreview
+                    url={previewUrl}
+                    title={`${title} Preview`}
+                    aspect={previewAspect}
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </CollapsibleContent>
@@ -111,12 +178,6 @@ export function WidgetConfigCard({
         {!isOpen && (
           <CardContent className="pt-0">
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <a href={previewUrl} target="_blank" rel="noreferrer">
-                  <MonitorPlay className="mr-2 h-4 w-4" />
-                  Preview
-                </a>
-              </Button>
               <Button variant="ghost" size="sm" onClick={handleCopy}>
                 {copied ? (
                   <>
