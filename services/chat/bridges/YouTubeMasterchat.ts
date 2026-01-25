@@ -177,7 +177,8 @@ export class YouTubeMasterchat {
   private parseChat(chat: AddChatItemAction): ChatMessage {
     // Handle message - it can be undefined in rare cases
     const messageText = chat.message ? stringify(chat.message) : "";
-    const authorName = chat.authorName ?? "Unknown";
+    // Remove @ prefix if present (YouTube sometimes includes it)
+    const authorName = (chat.authorName ?? "Unknown").replace(/^@/, "");
 
     return {
       id: `youtube-${chat.id}`,
