@@ -12,7 +12,7 @@ type ChatMessageProps = {
   message: ChatMessageType;
   showPlatform?: boolean;
   className?: string;
-  chatPrefs?: ChatDisplayPreferences;
+  chatPrefs?: Partial<ChatDisplayPreferences>;
 };
 
 // Font size classes

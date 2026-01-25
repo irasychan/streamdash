@@ -42,8 +42,8 @@ export function generateChatWidgetUrl(
     params.set("twitchChannel", config.twitchChannel);
   }
 
-  if (config.liveChatId) {
-    params.set("liveChatId", config.liveChatId);
+  if (config.youtubeVideoId) {
+    params.set("youtubeVideoId", config.youtubeVideoId);
   }
 
   if (config.discordChannelId) {

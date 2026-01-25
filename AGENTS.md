@@ -213,8 +213,20 @@ DISCORD_BOT_TOKEN=            # Required for chat (needs MESSAGE_CONTENT intent)
 
 | Platform | Auth Flow | Chat Bridge |
 |----------|-----------|-------------|
-| Twitch | OAuth → `/api/twitch/auth` | IRC via `TwitchBridge` |
-| YouTube | OAuth → `/api/youtube/auth` | Polling via `YouTubeBridge` |
+| Twitch | OAuth → `/api/twitch/auth` | IRC via `TwitchIRC` |
+| YouTube | None required | Masterchat via `YouTubeMasterchat` |
 | Discord | OAuth → `/api/discord/auth` | Gateway via `DiscordBridge` |
 
 Bot tokens and OAuth tokens are stored in httpOnly cookies.
+
+### YouTube Chat (Masterchat)
+
+YouTube chat uses the `masterchat` library which reverse-engineers YouTube's internal chat protocol:
+- **No API quota limits** - Unlike the YouTube Data API which has 10,000 units/day
+- **No OAuth required** - Works with just a video ID or URL
+- **Real-time messages** - Faster than polling (uses YouTube's internal protocol)
+
+To connect to YouTube chat, provide either:
+- Video ID: `dQw4w9WgXcQ`
+- Full URL: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`
+- Live URL: `https://www.youtube.com/live/dQw4w9WgXcQ`

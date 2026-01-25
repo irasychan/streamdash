@@ -6,10 +6,9 @@ import type {
 } from "@/features/chat/types/chat";
 import { TwitchIRC } from "./bridges/TwitchIRC";
 import {
-  YouTubePoller,
-  type YouTubeTokenState,
-  type YouTubeTokenUpdate,
-} from "./bridges/YouTubePoller";
+  YouTubeMasterchat,
+  type YouTubeMasterchatError,
+} from "./bridges/YouTubeMasterchat";
 import { DiscordBridge } from "./bridges/DiscordBridge";
 
 const MESSAGE_BUFFER_SIZE = 100;
@@ -22,9 +21,9 @@ class ConnectionManager {
   private messageIds: Set<string> = new Set();
 
   private twitchIRC: TwitchIRC | null = null;
-  private youtubePoller: YouTubePoller | null = null;
+  private youtubeMasterchat: YouTubeMasterchat | null = null;
   private discordBridge: DiscordBridge | null = null;
-  private youtubeTokenUpdate: YouTubeTokenUpdate | null = null;
+  private youtubeError: YouTubeMasterchatError | null = null;
 
   private constructor() {}
 
@@ -109,28 +108,30 @@ class ConnectionManager {
   }
 
   // YouTube connection
-  public async connectYouTube(
-    liveChatId: string,
-    tokenState: YouTubeTokenState
-  ): Promise<void> {
-    if (this.youtubePoller) {
-      this.youtubePoller.stop();
+  // Now uses masterchat - just needs video ID, no OAuth required
+  public async connectYouTube(videoIdOrUrl: string): Promise<void> {
+    if (this.youtubeMasterchat) {
+      this.youtubeMasterchat.stop();
     }
 
-    this.youtubeTokenUpdate = null;
-    this.youtubePoller = new YouTubePoller(liveChatId, tokenState, (update) => {
-      this.youtubeTokenUpdate = update;
+    this.youtubeError = null;
+    this.youtubeMasterchat = new YouTubeMasterchat(videoIdOrUrl);
+
+    this.youtubeMasterchat.onMessage((message) => this.broadcast(message));
+    this.youtubeMasterchat.onError((error) => {
+      this.youtubeError = error;
+      console.error("[ConnectionManager] YouTube error:", error);
     });
-    this.youtubePoller.onMessage((message) => this.broadcast(message));
-    await this.youtubePoller.start();
+
+    await this.youtubeMasterchat.start();
   }
 
   public disconnectYouTube(): void {
-    if (this.youtubePoller) {
-      this.youtubePoller.stop();
-      this.youtubePoller = null;
+    if (this.youtubeMasterchat) {
+      this.youtubeMasterchat.stop();
+      this.youtubeMasterchat = null;
     }
-    this.youtubeTokenUpdate = null;
+    this.youtubeError = null;
   }
 
   // Discord connection
@@ -160,8 +161,9 @@ class ConnectionManager {
       },
       {
         platform: "youtube" as ChatPlatform,
-        connected: this.youtubePoller?.isRunning() ?? false,
-        channel: this.youtubePoller?.getLiveChatId(),
+        connected: this.youtubeMasterchat?.isRunning() ?? false,
+        channel: this.youtubeMasterchat?.getVideoId(),
+        error: this.youtubeError?.message,
       },
       {
         platform: "discord" as ChatPlatform,
@@ -171,10 +173,12 @@ class ConnectionManager {
     ];
   }
 
-  public consumeYouTubeTokenUpdate(): YouTubeTokenUpdate | null {
-    const update = this.youtubeTokenUpdate;
-    this.youtubeTokenUpdate = null;
-    return update;
+  public getYouTubeError(): YouTubeMasterchatError | null {
+    return this.youtubeError;
+  }
+
+  public getYouTubeMetadata(): { title?: string; channelName?: string } | null {
+    return this.youtubeMasterchat?.getMetadata() ?? null;
   }
 
   public disconnectAll(): void {

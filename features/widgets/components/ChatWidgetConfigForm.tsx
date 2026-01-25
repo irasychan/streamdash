@@ -95,16 +95,16 @@ export function ChatWidgetConfigForm({
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="live-chat-id">YouTube Live Chat ID</Label>
+          <Label htmlFor="youtube-video">YouTube Video ID or URL</Label>
           <Input
-            id="live-chat-id"
-            placeholder="Cg0KC..."
-            value={config.liveChatId}
-            onChange={(e) => onChange({ liveChatId: e.target.value })}
+            id="youtube-video"
+            placeholder="dQw4w9WgXcQ or https://youtube.com/watch?v=..."
+            value={config.youtubeVideoId}
+            onChange={(e) => onChange({ youtubeVideoId: e.target.value })}
             disabled={disabled}
           />
           <p className="text-xs text-muted-foreground">
-            Changes for each stream. Leave empty to set manually.
+            Enter a video ID or full URL. No auth required.
           </p>
         </div>
       </div>

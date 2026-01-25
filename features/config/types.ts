@@ -20,8 +20,8 @@ export type ChatWidgetConfig = {
   transparent: boolean;
   /** Auto-connect to Twitch channel */
   twitchChannel: string;
-  /** Auto-connect to YouTube live chat */
-  liveChatId: string;
+  /** Auto-connect to YouTube video (ID or URL) */
+  youtubeVideoId: string;
   /** Auto-connect to Discord channel */
   discordChannelId: string;
   /** Font size: small, medium, large */
@@ -81,7 +81,7 @@ export type PlatformConfig = {
   };
   youtube: {
     defaultChannelId: string;
-    defaultLiveChatId: string;
+    defaultVideoId: string;
   };
   discord: {
     defaultGuildId: string;
@@ -111,7 +111,7 @@ export const DEFAULT_CHAT_WIDGET_CONFIG: ChatWidgetConfig = {
   showPlatformBadge: true,
   transparent: false,
   twitchChannel: "",
-  liveChatId: "",
+  youtubeVideoId: "",
   discordChannelId: "",
   fontSize: "medium",
   messageDensity: "comfortable",
@@ -146,7 +146,7 @@ export const DEFAULT_CONFIG: StreamDashConfig = {
     },
     youtube: {
       defaultChannelId: "",
-      defaultLiveChatId: "",
+      defaultVideoId: "",
     },
     discord: {
       defaultGuildId: "",
