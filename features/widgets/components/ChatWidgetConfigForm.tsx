@@ -197,6 +197,47 @@ export function ChatWidgetConfigForm({
             </Select>
           </div>
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="message-layout">Message Layout</Label>
+            <Select
+              value={config.messageLayout}
+              onValueChange={(value: "inline" | "stacked") =>
+                onChange({ messageLayout: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="message-layout">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="inline">Inline (name: message)</SelectItem>
+                <SelectItem value="stacked">Stacked (name on top)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="text-align">Text Alignment</Label>
+            <Select
+              value={config.textAlign}
+              onValueChange={(value: "left" | "center" | "right") =>
+                onChange({ textAlign: value })
+              }
+              disabled={disabled}
+            >
+              <SelectTrigger id="text-align">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="left">Left</SelectItem>
+                <SelectItem value="center">Center</SelectItem>
+                <SelectItem value="right">Right</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       <Separator />

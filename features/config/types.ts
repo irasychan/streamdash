@@ -34,6 +34,10 @@ export type ChatWidgetConfig = {
   showBadges: boolean;
   /** Message animation style */
   animation: "none" | "fade" | "slide";
+  /** Message layout: inline (name: msg) or stacked (name on top) */
+  messageLayout: "inline" | "stacked";
+  /** Text alignment */
+  textAlign: "left" | "center" | "right";
 };
 
 export type GoalWidgetConfig = {
@@ -118,6 +122,8 @@ export const DEFAULT_CHAT_WIDGET_CONFIG: ChatWidgetConfig = {
   showAvatars: false,
   showBadges: true,
   animation: "fade",
+  messageLayout: "inline",
+  textAlign: "left",
 };
 
 export const DEFAULT_GOAL_WIDGET_CONFIG: GoalWidgetConfig = {

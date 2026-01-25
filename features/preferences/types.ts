@@ -12,6 +12,8 @@ export type FontSize = "small" | "medium" | "large";
 export type MessageDensity = "compact" | "comfortable" | "spacious";
 export type TimestampFormat = "hidden" | "relative" | "absolute";
 export type UsernameColorMode = "platform" | "theme" | "custom";
+export type MessageLayout = "inline" | "stacked";
+export type TextAlign = "left" | "center" | "right";
 
 export type ChatDisplayPreferences = {
   /** Font size for chat messages */
@@ -32,6 +34,10 @@ export type ChatDisplayPreferences = {
   showTwitchEmotes: boolean;
   /** Show third-party emotes (BTTV, FFZ, 7TV) */
   showThirdPartyEmotes: boolean;
+  /** Message layout: inline (username: message) or stacked (username on top) */
+  messageLayout: MessageLayout;
+  /** Text alignment */
+  textAlign: TextAlign;
 };
 
 // --- Theme Preferences ---
@@ -72,6 +78,8 @@ export const DEFAULT_CHAT_PREFERENCES: ChatDisplayPreferences = {
   showAvatars: true,
   showTwitchEmotes: true,
   showThirdPartyEmotes: true,
+  messageLayout: "inline",
+  textAlign: "left",
 };
 
 export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {

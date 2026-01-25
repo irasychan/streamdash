@@ -8,7 +8,7 @@ import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
 import { useEmotes } from "@/features/emotes/hooks/useEmotes";
 import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/features/chat/types/chat";
-import type { ChatDisplayPreferences, FontSize, MessageDensity } from "@/features/preferences/types";
+import type { ChatDisplayPreferences, FontSize, MessageDensity, MessageLayout, TextAlign } from "@/features/preferences/types";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
@@ -58,6 +58,16 @@ function ChatWidgetContent() {
     const showBadges = searchParams.get("showBadges");
     if (showBadges !== null) {
       prefs.showBadges = showBadges !== "false";
+    }
+
+    const messageLayout = searchParams.get("messageLayout");
+    if (messageLayout && ["inline", "stacked"].includes(messageLayout)) {
+      prefs.messageLayout = messageLayout as MessageLayout;
+    }
+
+    const textAlign = searchParams.get("textAlign");
+    if (textAlign && ["left", "center", "right"].includes(textAlign)) {
+      prefs.textAlign = textAlign as TextAlign;
     }
 
     return prefs;
