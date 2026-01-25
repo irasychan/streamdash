@@ -18,7 +18,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] Unified chat types and data structures
 - [x] Server-Sent Events (SSE) streaming endpoint
 - [x] Twitch IRC client (WebSocket)
-- [x] YouTube Live Chat poller
+- [x] YouTube Masterchat bridge (no OAuth)
 - [x] Discord Gateway bridge
 - [x] Chat UI components (ChatMessage, PlatformBadge, etc.)
 - [x] OBS chat widget with transparent mode
@@ -44,11 +44,23 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] lib/chat/ directory restructure (bridges/, utils/)
 
 ## Phase 3: Enhanced Features (In Progress)
-- [ ] Widget preview in dashboard (iframe-based)
+- [x] Widget preview in dashboard (iframe-based, Completed - Jan 25, 2026)
 - [x] Widget configuration UI (Completed - Jan 24, 2026)
-- [ ] Chat message sending (bi-directional)
+- [x] Chat widget layout + animation options (Completed - Jan 25, 2026)
+- [x] Local message hiding (hide from OBS widget, visible in dashboard - Jan 25, 2026)
+
+## Phase 3.1: SQLite Persistence (Planned)
+- [ ] Define SQLite schema for config, chat, moderation
+- [ ] Add SQLite + migration tooling
+- [ ] Persist streamer config, channel bindings, widget prefs
+- [ ] Store chat messages with retention policy
+- [ ] Store moderation actions (hide/ban/timeout) with audit trail
+
+## Phase 3.2: Moderation + Chat Experience (Planned)
 - [ ] Chat moderation controls (timeout, ban)
 - [ ] Message highlighting (mentions, keywords)
+- [ ] Live chat feed improvements (filters, search, load more)
+- [ ] Chatter focus view (profile, join time, message history)
 
 ## Phase 4: Alerts & Notifications (Planned)
 - [ ] New follower alerts
@@ -71,6 +83,16 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [ ] Channel switching in dashboard
 - [ ] Comparative analytics
 
+## Phase 7: Auth, Roles, Deployment (Planned)
+- [ ] User authentication (sessions, logout, password reset)
+- [ ] Role-based access (owner, moderator, viewer)
+- [ ] Moderator access to moderation + settings
+- [ ] Deployment target + persistent storage strategy
+- [ ] Secrets management for hosted environments
+
+## Icebox / Backlog
+- [ ] Chat message sending (bi-directional)
+
 ---
 
 ## Tech Stack
@@ -78,7 +100,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - **UI:** shadcn/ui + Tailwind CSS
 - **Language:** TypeScript (strict mode)
 - **Real-time:** Server-Sent Events (SSE)
-- **External APIs:** Twitch Helix, YouTube Data API v3, Discord Gateway
+- **External APIs:** Twitch Helix, YouTube Data API v3 (stats), YouTube Masterchat (chat), Discord Gateway
 
 ## Environment Variables
 ```
@@ -88,8 +110,6 @@ TWITCH_CLIENT_SECRET=
 YOUTUBE_API_KEY=
 
 # Optional (for full chat features)
-YOUTUBE_CLIENT_ID=
-YOUTUBE_CLIENT_SECRET=
 DISCORD_CLIENT_ID=
 DISCORD_CLIENT_SECRET=
 DISCORD_BOT_TOKEN=          # Needs MESSAGE_CONTENT intent

@@ -1,5 +1,7 @@
 export type ChatPlatform = "twitch" | "youtube" | "discord";
 
+export type ChatModerationAction = "timeout" | "ban" | "hide" | "unhide";
+
 export type ChatAuthor = {
   id: string;
   name: string;
@@ -57,8 +59,15 @@ export type ChatConnectionConfig = {
   };
 };
 
+export type ChatHideEvent = {
+  type: "hide" | "unhide";
+  messageId: string;
+};
+
+export type SSEEvent = ChatMessage | ChatHideEvent | { type: "keepalive"; clientId: string };
+
 export type SSEClient = {
   id: string;
-  send: (message: ChatMessage) => void;
+  send: (event: SSEEvent) => void;
   close: () => void;
 };

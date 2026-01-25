@@ -1,5 +1,5 @@
 import { connectionManager } from "@/services/chat/ConnectionManager";
-import type { ChatMessage, SSEClient } from "@/features/chat/types/chat";
+import type { SSEClient, SSEEvent } from "@/features/chat/types/chat";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -12,17 +12,17 @@ export async function GET(request: Request) {
     start(controller) {
       const client: SSEClient = {
         id: clientId,
-        send: (message: ChatMessage) => {
+        send: (event: SSEEvent) => {
           try {
-            const data = `data: ${JSON.stringify(message)}\n\n`;
+            const data = `data: ${JSON.stringify(event)}\n\n`;
             controller.enqueue(encoder.encode(data));
           } catch (error) {
             // Controller might be closed or the SSE connection may be invalid
             console.error(
-              "Error sending SSE message for client",
+              "Error sending SSE event for client",
               clientId,
-              "message:",
-              message,
+              "event:",
+              event,
               "error:",
               error,
             );
