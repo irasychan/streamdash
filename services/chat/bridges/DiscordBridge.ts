@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@/features/chat/types/chat";
+import { getUsernameColor } from "@/lib/chat/usernameColor";
 
 type MessageCallback = (message: ChatMessage) => void;
 
@@ -192,17 +193,22 @@ export class DiscordBridge {
       return null;
     }
 
+    // Remove @ prefix if present (Discord sometimes includes it)
+    const displayName = (data.author.global_name || data.author.username).replace(/^@/, "");
+    const username = data.author.username.replace(/^@/, "");
+
     return {
       id: `discord-${data.id}`,
       platform: "discord",
       timestamp: new Date(data.timestamp).getTime(),
       author: {
         id: data.author.id,
-        name: data.author.username,
-        displayName: data.author.global_name || data.author.username,
+        name: username,
+        displayName: displayName,
         avatar: data.author.avatar
           ? `https://cdn.discordapp.com/avatars/${data.author.id}/${data.author.avatar}.png`
           : undefined,
+        color: getUsernameColor(username),
       },
       content: data.content,
       isModerator: false, // Would need role checking
