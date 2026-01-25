@@ -14,6 +14,7 @@ export type TimestampFormat = "hidden" | "relative" | "absolute";
 export type UsernameColorMode = "platform" | "theme" | "custom";
 export type MessageLayout = "inline" | "stacked";
 export type TextAlign = "left" | "center" | "right";
+export type MessageAnimation = "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce";
 
 export type ChatDisplayPreferences = {
   /** Font size for chat messages */

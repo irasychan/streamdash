@@ -181,7 +181,7 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="animation">Message Animation</Label>
             <Select
               value={config.animation}
-              onValueChange={(value: "none" | "fade" | "slide") =>
+              onValueChange={(value: "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce") =>
                 onChange({ animation: value })
               }
               disabled={disabled}
@@ -192,7 +192,12 @@ export function ChatWidgetConfigForm({
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
                 <SelectItem value="fade">Fade In</SelectItem>
-                <SelectItem value="slide">Slide In</SelectItem>
+                <SelectItem value="slide-left">Slide from Left</SelectItem>
+                <SelectItem value="slide-right">Slide from Right</SelectItem>
+                <SelectItem value="slide-up">Slide from Bottom</SelectItem>
+                <SelectItem value="slide-down">Slide from Top</SelectItem>
+                <SelectItem value="scale">Scale In</SelectItem>
+                <SelectItem value="bounce">Bounce In</SelectItem>
               </SelectContent>
             </Select>
           </div>

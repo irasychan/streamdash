@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { ChatMessage as ChatMessageType } from "../types/chat";
-import type { ChatDisplayPreferences, MessageLayout, TextAlign } from "@/features/preferences/types";
+import type { ChatDisplayPreferences, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/ui/cn";
 import { renderMessageWithEmotes } from "../utils/emoteRenderer";
@@ -13,6 +13,7 @@ type ChatMessageProps = {
   showPlatform?: boolean;
   className?: string;
   chatPrefs?: Partial<ChatDisplayPreferences>;
+  animation?: MessageAnimation;
 };
 
 // Font size classes
@@ -63,11 +64,24 @@ const flexAlignClasses: Record<TextAlign, string> = {
   right: "justify-end",
 };
 
+// Animation classes
+const animationClasses: Record<MessageAnimation, string> = {
+  none: "",
+  fade: "chat-anim-fade",
+  "slide-left": "chat-anim-slide-left",
+  "slide-right": "chat-anim-slide-right",
+  "slide-up": "chat-anim-slide-up",
+  "slide-down": "chat-anim-slide-down",
+  scale: "chat-anim-scale",
+  bounce: "chat-anim-bounce",
+};
+
 export function ChatMessage({
   message,
   showPlatform = true,
   className,
   chatPrefs,
+  animation = "none",
 }: ChatMessageProps) {
   const { author, content, platform, emotes, isModerator, isSubscriber } = message;
   const { emotes: thirdPartyEmotes } = useEmotes();
@@ -95,6 +109,7 @@ export function ChatMessage({
         densityClasses[density],
         isStacked ? "flex-col gap-0.5" : "items-start gap-2.5",
         textAlignClasses[textAlign],
+        animationClasses[animation],
         className
       )}
       style={fontFamily ? { fontFamily } : undefined}

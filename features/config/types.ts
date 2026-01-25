@@ -33,7 +33,7 @@ export type ChatWidgetConfig = {
   /** Show badges (mod, sub, etc.) */
   showBadges: boolean;
   /** Message animation style */
-  animation: "none" | "fade" | "slide";
+  animation: "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce";
   /** Message layout: inline (name: msg) or stacked (name on top) */
   messageLayout: "inline" | "stacked";
   /** Text alignment */

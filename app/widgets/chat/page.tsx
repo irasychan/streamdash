@@ -8,7 +8,7 @@ import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
 import { useEmotes } from "@/features/emotes/hooks/useEmotes";
 import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/features/chat/types/chat";
-import type { ChatDisplayPreferences, FontSize, MessageDensity, MessageLayout, TextAlign } from "@/features/preferences/types";
+import type { ChatDisplayPreferences, FontSize, MessageDensity, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
@@ -71,6 +71,16 @@ function ChatWidgetContent() {
     }
 
     return prefs;
+  }, [searchParams]);
+
+  // Animation from URL params
+  const animation = useMemo<MessageAnimation>(() => {
+    const anim = searchParams.get("animation");
+    const validAnimations = ["none", "fade", "slide-left", "slide-right", "slide-up", "slide-down", "scale", "bounce"];
+    if (anim && validAnimations.includes(anim)) {
+      return anim as MessageAnimation;
+    }
+    return "none";
   }, [searchParams]);
 
   // Load emotes for Twitch channel
@@ -207,6 +217,7 @@ function ChatWidgetContent() {
               message={msg}
               showPlatform={showPlatformBadge}
               chatPrefs={chatPrefs}
+              animation={animation}
             />
           ))}
         </div>
