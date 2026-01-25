@@ -8,6 +8,7 @@ import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
 import { useEmotes } from "@/features/emotes/hooks/useEmotes";
 import type { ChatMessage as ChatMessageType, ChatPlatform } from "@/features/chat/types/chat";
+import type { ChatDisplayPreferences, FontSize, MessageDensity } from "@/features/preferences/types";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
@@ -34,6 +35,33 @@ function ChatWidgetContent() {
     () => searchParams.get("transparent") === "true",
     [searchParams]
   );
+
+  // Chat display preferences from URL params
+  const chatPrefs = useMemo<Partial<ChatDisplayPreferences>>(() => {
+    const prefs: Partial<ChatDisplayPreferences> = {};
+
+    const fontSize = searchParams.get("fontSize");
+    if (fontSize && ["small", "medium", "large"].includes(fontSize)) {
+      prefs.fontSize = fontSize as FontSize;
+    }
+
+    const messageDensity = searchParams.get("messageDensity");
+    if (messageDensity && ["compact", "comfortable", "spacious"].includes(messageDensity)) {
+      prefs.messageDensity = messageDensity as MessageDensity;
+    }
+
+    const showAvatars = searchParams.get("showAvatars");
+    if (showAvatars !== null) {
+      prefs.showAvatars = showAvatars !== "false";
+    }
+
+    const showBadges = searchParams.get("showBadges");
+    if (showBadges !== null) {
+      prefs.showBadges = showBadges !== "false";
+    }
+
+    return prefs;
+  }, [searchParams]);
 
   // Load emotes for Twitch channel
   const loadChannelEmotes = useCallback(async (channel: string) => {
@@ -172,6 +200,7 @@ function ChatWidgetContent() {
               key={msg.id}
               message={msg}
               showPlatform={showPlatformBadge}
+              chatPrefs={chatPrefs}
             />
           ))}
         </div>
@@ -198,12 +227,21 @@ function ChatWidgetSkeleton() {
   );
 }
 
+function ChatWidgetWrapper() {
+  const searchParams = useSearchParams();
+  const transparent = searchParams.get("transparent") === "true";
+
+  return (
+    <main className={transparent ? "min-h-screen" : "p-4 min-h-screen"}>
+      <ChatWidgetContent />
+    </main>
+  );
+}
+
 export default function ChatWidget() {
   return (
-    <main className="p-4 min-h-screen">
-      <Suspense fallback={<ChatWidgetSkeleton />}>
-        <ChatWidgetContent />
-      </Suspense>
-    </main>
+    <Suspense fallback={<ChatWidgetSkeleton />}>
+      <ChatWidgetWrapper />
+    </Suspense>
   );
 }

@@ -61,7 +61,7 @@ export function ChatMessage({
   // Default preferences if not provided
   const fontSize = chatPrefs?.fontSize ?? "medium";
   const density = chatPrefs?.messageDensity ?? "comfortable";
-  const showAvatars = chatPrefs?.showAvatars ?? true;
+  const showAvatars = chatPrefs?.showAvatars ?? false;
   const showBadges = chatPrefs?.showBadges ?? true;
   const showTwitchEmotes = chatPrefs?.showTwitchEmotes ?? true;
   const showThirdPartyEmotes = chatPrefs?.showThirdPartyEmotes ?? true;
