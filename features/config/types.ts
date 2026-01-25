@@ -34,8 +34,8 @@ export type ChatWidgetConfig = {
   showBadges: boolean;
   /** Message animation style */
   animation: "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce";
-  /** Message layout: inline (name: msg) or stacked (name on top) */
-  messageLayout: "inline" | "stacked";
+  /** Message layout: inline (columns), inline-wrap (natural flow), or stacked (name on top) */
+  messageLayout: "inline" | "inline-wrap" | "stacked";
   /** Text alignment */
   textAlign: "left" | "center" | "right";
 };

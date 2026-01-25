@@ -8,8 +8,10 @@ fallbacks so you can explore the layout before wiring credentials.
 
 - Dashboard overview with live status, stats, goals, and unified chat
 - OBS widgets for stream stats, follower goals, and live chat overlays
+- Multi-platform chat aggregation (Twitch, YouTube, Discord) with customizable layouts
+- Message animations (fade, slide, scale, bounce) for chat widgets
 - Twitch Helix proxy with OAuth-based follower counts and app-token fallback
-- YouTube channel stats proxy (channel ID or handle)
+- YouTube live chat via [masterchat](https://github.com/holodata/masterchat) (no API quota limits)
 - Server-sent events chat stream with connect/disconnect endpoints
 
 ## Quick start
@@ -30,8 +32,6 @@ TWITCH_CLIENT_ID=
 TWITCH_CLIENT_SECRET=
 TWITCH_APP_ACCESS_TOKEN=
 YOUTUBE_API_KEY=
-YOUTUBE_CLIENT_ID=
-YOUTUBE_CLIENT_SECRET=
 DISCORD_BOT_TOKEN=
 DISCORD_CLIENT_ID=
 DISCORD_CLIENT_SECRET=
@@ -44,11 +44,12 @@ Notes:
 - Twitch follower counts require OAuth (visit `/api/twitch/auth` after setting
    Twitch credentials).
 - Discord chat requires `DISCORD_BOT_TOKEN` and a channel ID for `/api/chat/connect`.
+- YouTube chat uses masterchat - no OAuth or API key required, just provide a video ID or URL.
 
 ## OAuth setup guide
 
-You need three OAuth clients (Twitch, YouTube, Discord) for full chat + stats
-features. Each provider needs a redirect URL pointing back to this app.
+You need OAuth clients for Twitch and Discord for full chat + stats features.
+YouTube chat works without any credentials.
 
 ### Twitch OAuth
 
@@ -66,23 +67,19 @@ TWITCH_CLIENT_ID=
 TWITCH_CLIENT_SECRET=
 ```
 
-### YouTube OAuth
+### YouTube (No OAuth Required)
 
-1. Create OAuth credentials in Google Cloud Console:
-   https://console.cloud.google.com/apis/credentials
-2. Add redirect URL: `http://localhost:3000/api/youtube/callback` (add your
-   production URL too).
-3. Copy Client ID + Client Secret into `.env.local`.
-4. Start auth: visit `http://localhost:3000/api/youtube/auth`.
+YouTube chat is powered by [masterchat](https://github.com/holodata/masterchat),
+which reverse-engineers YouTube's internal chat protocol. This means:
 
-Note: refreshed YouTube tokens are cached server-side in `.data/youtube-token.json`.
+- **No API quota limits** - YouTube Data API has 10,000 units/day; masterchat has none
+- **No OAuth required** - Just provide a video ID or URL
+- **Real-time messages** - Faster than API polling
 
-Required env vars:
-
-```bash
-YOUTUBE_CLIENT_ID=
-YOUTUBE_CLIENT_SECRET=
-```
+To connect, provide either:
+- Video ID: `dQw4w9WgXcQ`
+- Full URL: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`
+- Live URL: `https://www.youtube.com/live/dQw4w9WgXcQ`
 
 ### Discord OAuth
 
@@ -151,9 +148,15 @@ Chat widget (`/widgets/chat`):
 - `showPlatform` - set to `false` to hide platform badges
 - `transparent` - set to `true` for transparent OBS overlays
 - `twitchChannel` - auto-connect Twitch channel
-- `youtubeVideoId` - video id to connect (requires `liveChatId` too)
-- `liveChatId` - YouTube live chat id
+- `youtubeVideoId` - YouTube video ID or URL to connect
 - `discordChannelId` - Discord channel id
+- `fontSize` - `small`, `medium`, `large`
+- `messageDensity` - `compact`, `comfortable`, `spacious`
+- `messageLayout` - `inline`, `inline-wrap`, `stacked`
+- `textAlign` - `left`, `center`, `right`
+- `animation` - `none`, `fade`, `slide-left`, `slide-right`, `slide-up`, `slide-down`, `scale`, `bounce`
+- `showAvatars` - set to `true` to show user avatars
+- `showBadges` - set to `false` to hide mod/sub badges
 
 ## API routes
 
@@ -174,3 +177,9 @@ Chat widget (`/widgets/chat`):
 
 Add any widget URL as a Browser Source in OBS. For transparency, use the chat
 widget with `transparent=true` and set OBS background color to transparent.
+
+## Credits
+
+- [masterchat](https://github.com/holodata/masterchat) - YouTube live chat without API limits
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Tailwind CSS](https://tailwindcss.com/) - Styling

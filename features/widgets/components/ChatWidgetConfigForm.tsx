@@ -208,7 +208,7 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="message-layout">Message Layout</Label>
             <Select
               value={config.messageLayout}
-              onValueChange={(value: "inline" | "stacked") =>
+              onValueChange={(value: "inline" | "inline-wrap" | "stacked") =>
                 onChange({ messageLayout: value })
               }
               disabled={disabled}
@@ -217,7 +217,8 @@ export function ChatWidgetConfigForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="inline">Inline (name: message)</SelectItem>
+                <SelectItem value="inline">Inline (two columns)</SelectItem>
+                <SelectItem value="inline-wrap">Inline Wrap (natural flow)</SelectItem>
                 <SelectItem value="stacked">Stacked (name on top)</SelectItem>
               </SelectContent>
             </Select>

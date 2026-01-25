@@ -61,7 +61,7 @@ function ChatWidgetContent() {
     }
 
     const messageLayout = searchParams.get("messageLayout");
-    if (messageLayout && ["inline", "stacked"].includes(messageLayout)) {
+    if (messageLayout && ["inline", "inline-wrap", "stacked"].includes(messageLayout)) {
       prefs.messageLayout = messageLayout as MessageLayout;
     }
 

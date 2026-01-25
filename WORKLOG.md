@@ -2,10 +2,44 @@
 
 ## Recently Completed
 
+### Chat Widget Layout & Animation Enhancements (Jan 25, 2026)
+**Status:** Complete
+
+Added flexible message layout options and entrance animations for chat widgets.
+
+**Message Layout Options:**
+- `inline` - Two-column flex layout (name in column 1, message in column 2)
+- `inline-wrap` - Natural flowing text where name and message wrap together
+- `stacked` - Name on top, message below (two lines)
+
+**Message Animations (8 options):**
+- `none`, `fade`, `slide-left`, `slide-right`, `slide-up`, `slide-down`, `scale`, `bounce`
+
+**Text Alignment:**
+- `left`, `center`, `right` options for all layouts
+
+**Username Display Fixes:**
+- Removed `@` prefix from Discord and YouTube usernames
+- Added consistent username colors across all platforms using shared `lib/chat/usernameColor.ts`
+
+**Files Modified:**
+- `features/chat/components/ChatMessage.tsx` - Layout, alignment, animation support
+- `features/widgets/components/ChatWidgetConfigForm.tsx` - New UI controls
+- `features/preferences/types.ts` - Added MessageLayout, TextAlign, MessageAnimation types
+- `features/config/types.ts` - Added new config options
+- `services/widgets/urlGenerator.ts` - New URL params
+- `app/widgets/chat/page.tsx` - Read new params
+- `app/globals.css` - Animation keyframes
+- `services/chat/bridges/DiscordBridge.ts` - Color, @ removal
+- `services/chat/bridges/YouTubeMasterchat.ts` - Color, @ removal
+- `lib/chat/usernameColor.ts` - Shared color utility
+
+---
+
 ### YouTube Chat Migration to Masterchat (Jan 25, 2026)
 **Status:** Complete
 
-Replaced YouTube Data API polling with `masterchat` library to avoid quota limits.
+Replaced YouTube Data API polling with [`masterchat`](https://github.com/holodata/masterchat) library to avoid quota limits.
 
 **Changes Made:**
 - Installed `masterchat` package
