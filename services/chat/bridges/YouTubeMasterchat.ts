@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@/features/chat/types/chat";
+import { getUsernameColor } from "@/lib/chat/usernameColor";
 import {
   Masterchat,
   MasterchatError,
@@ -176,6 +177,7 @@ export class YouTubeMasterchat {
   private parseChat(chat: AddChatItemAction): ChatMessage {
     // Handle message - it can be undefined in rare cases
     const messageText = chat.message ? stringify(chat.message) : "";
+    const authorName = chat.authorName ?? "Unknown";
 
     return {
       id: `youtube-${chat.id}`,
@@ -185,9 +187,10 @@ export class YouTubeMasterchat {
         : Date.now(),
       author: {
         id: chat.authorChannelId,
-        name: chat.authorName ?? "Unknown",
-        displayName: chat.authorName ?? "Unknown",
+        name: authorName,
+        displayName: authorName,
         avatar: chat.authorPhoto,
+        color: getUsernameColor(authorName),
       },
       content: messageText,
       isModerator: chat.isModerator || chat.isOwner, // treat owner as moderator

@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@/features/chat/types/chat";
+import { getUsernameColor } from "@/lib/chat/usernameColor";
 
 type MessageCallback = (message: ChatMessage) => void;
 
@@ -203,6 +204,7 @@ export class DiscordBridge {
         avatar: data.author.avatar
           ? `https://cdn.discordapp.com/avatars/${data.author.id}/${data.author.avatar}.png`
           : undefined,
+        color: getUsernameColor(data.author.username),
       },
       content: data.content,
       isModerator: false, // Would need role checking
