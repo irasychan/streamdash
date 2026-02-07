@@ -20,6 +20,8 @@ type ChatMessageProps = {
   onUnhide?: (message: ChatMessageType) => void;
   isHighlighted?: boolean;
   isHidden?: boolean;
+  isSelected?: boolean;
+  onSelect?: (message: ChatMessageType) => void;
 };
 
 // Font size classes
@@ -93,6 +95,8 @@ export function ChatMessage({
   onUnhide,
   isHighlighted,
   isHidden = false,
+  isSelected = false,
+  onSelect,
 }: ChatMessageProps) {
   const { author, content, platform, emotes, isModerator, isSubscriber } = message;
   const { emotes: thirdPartyEmotes } = useEmotes();
@@ -109,8 +113,9 @@ export function ChatMessage({
   const textAlign = chatPrefs?.textAlign ?? "left";
 
   const highlighted = isHighlighted ?? message.isHighlighted;
-  const showModerationControls = Boolean(onModerate) && platform === "twitch";
-  const showHideControls = Boolean(onHide) || Boolean(onUnhide);
+  // When onSelect is provided (dashboard mode), suppress hover buttons — the action bar handles it
+  const showModerationControls = !onSelect && Boolean(onModerate) && platform === "twitch";
+  const showHideControls = !onSelect && (Boolean(onHide) || Boolean(onUnhide));
 
   const handleModerate = (action: ChatModerationAction) => (event: MouseEvent) => {
     event.preventDefault();
@@ -180,6 +185,8 @@ export function ChatMessage({
 
   const hasActionButtons = showModerationControls || showHideControls;
 
+  const handleClick = onSelect ? () => onSelect(message) : undefined;
+
   // inline-wrap: everything flows in a single wrapping line
   if (isInlineWrap) {
     return (
@@ -190,6 +197,8 @@ export function ChatMessage({
           highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
           isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
           isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
+          isSelected && "ring-2 ring-primary/60 bg-primary/10",
+          onSelect && "cursor-pointer",
           fontSizeClasses[fontSize],
           densityClasses[density],
           textAlignClasses[textAlign],
@@ -198,6 +207,7 @@ export function ChatMessage({
           className
         )}
         style={fontFamily ? { fontFamily } : undefined}
+        onClick={handleClick}
       >
         {actionButtons}
         <span className="inline">
@@ -270,6 +280,8 @@ export function ChatMessage({
         highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
         isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
         isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
+        isSelected && "ring-2 ring-primary/60 bg-primary/10",
+        onSelect && "cursor-pointer",
         fontSizeClasses[fontSize],
         densityClasses[density],
         isStacked ? "flex-col gap-0.5" : "items-start gap-2.5",
@@ -279,6 +291,7 @@ export function ChatMessage({
         className
       )}
       style={fontFamily ? { fontFamily } : undefined}
+      onClick={handleClick}
     >
       {actionButtons}
       {/* Header row: platform badge, avatar, username, badges */}
