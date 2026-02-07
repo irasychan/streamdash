@@ -48,6 +48,8 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] Widget configuration UI (Completed - Jan 24, 2026)
 - [x] Chat widget layout + animation options (Completed - Jan 25, 2026)
 - [x] Local message hiding (hide from OBS widget, visible in dashboard - Jan 25, 2026)
+- [x] Debug chat input in dashboard with multi-platform simulation (Feb 8, 2026)
+- [x] OBS chat widget scrollbar hidden for cleaner overlay (Feb 8, 2026)
 
 ## Phase 3.1: SQLite Persistence (Planned)
 - [ ] Define SQLite schema for config, chat, moderation
@@ -92,6 +94,15 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 
 ## Icebox / Backlog
 - [ ] Chat message sending (bi-directional)
+- [ ] Multiple Twitch channel monitoring
+- [ ] Multiple YouTube channel monitoring
+- [ ] Channel switching in dashboard
+- [ ] Comparative analytics
+- [ ] User authentication (sessions, logout, password reset)
+- [ ] Role-based access (owner, moderator, viewer)
+- [ ] Moderator access to moderation + settings
+- [ ] Deployment target + persistent storage strategy
+- [ ] Secrets management for hosted environments
 
 ---
 

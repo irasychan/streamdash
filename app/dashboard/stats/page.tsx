@@ -4,39 +4,61 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatCard from "@/components/StatCard";
 import { demoStats } from "@/lib/demoData";
+import { useConfig } from "@/features/config/useConfig";
 
 type DashboardStats = typeof demoStats;
 
 export default function StatsPage() {
+  const { config, loading: configLoading } = useConfig();
   const [stats, setStats] = useState<DashboardStats>(demoStats);
+  const [status, setStatus] = useState<"loading" | "live" | "demo" | "error">("loading");
 
   useEffect(() => {
+    // Wait for config to load before fetching stats
+    if (configLoading) return;
+
     const loadStats = async () => {
       try {
-        const twitchResponse = await fetch("/api/twitch?channel=" + demoStats.channel);
-        const youtubeResponse = await fetch(
-          "/api/youtube?channelId=" + demoStats.youtubeChannelId
-        );
+        // Use configured channel, fallback to demo
+        const twitchChannel = config.platforms.twitch.defaultChannel || demoStats.channel;
+        const youtubeChannelId = config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
+
+        const twitchResponse = await fetch("/api/twitch?channel=" + twitchChannel);
+        const youtubeResponse = await fetch("/api/youtube?channelId=" + youtubeChannelId);
 
         const twitchData = await twitchResponse.json();
         const youtubeData = await youtubeResponse.json();
 
-        if (twitchData.ok && youtubeData.ok) {
+        const twitchOk = twitchData.ok;
+        const youtubeOk = youtubeData.ok;
+
+        if (twitchOk || youtubeOk) {
           setStats({
             ...demoStats,
-            ...twitchData.data,
-            youtube: youtubeData.data,
+            channel: twitchChannel,
+            ...(twitchOk ? twitchData.data : {}),
+            youtube: youtubeOk ? youtubeData.data : demoStats.youtube,
           });
+          setStatus("live");
+        } else {
+          setStatus("demo");
         }
       } catch {
-        // Keep demo data
+        setStatus("error");
       }
     };
 
     loadStats();
     const interval = setInterval(loadStats, 20000);
     return () => clearInterval(interval);
-  }, []);
+  }, [config, configLoading]);
+
+  const statusText = {
+    loading: "Loading...",
+    live: "Live data",
+    demo: "Demo mode",
+    error: "Demo mode (network error)",
+  }[status];
 
   return (
     <div className="space-y-6">
@@ -44,6 +66,9 @@ export default function StatsPage() {
         <h2 className="font-display text-2xl font-semibold">Statistics</h2>
         <p className="mt-1 text-muted-foreground">
           Track your streaming metrics across all platforms.
+          <span className="ml-2 text-xs text-muted-foreground/60">
+            {statusText}
+          </span>
         </p>
       </div>
 

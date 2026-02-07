@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Tv, Youtube, MessageCircle, Target, Key, RotateCcw } from "lucide-react";
+import { ChevronDown, Tv, Youtube, MessageCircle, Target, Key, RotateCcw, Save } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useConfig } from "@/features/config/useConfig";
 import { DiscordChannelPicker } from "@/components/DiscordChannelPicker";
@@ -176,23 +177,47 @@ function SettingsForm({
   );
 
   const handleSave = async () => {
-    await update({
-      platforms: {
-        twitch: { defaultChannel: twitchChannel },
-        youtube: {
-          defaultChannelId: youtubeChannelId,
-          defaultVideoId: youtubeVideoId,
+    try {
+      await update({
+        platforms: {
+          twitch: { defaultChannel: twitchChannel },
+          youtube: {
+            defaultChannelId: youtubeChannelId,
+            defaultVideoId: youtubeVideoId,
+          },
+          discord: { defaultChannelId: discordChannelId },
         },
-        discord: { defaultChannelId: discordChannelId },
-      },
-      goals: {
-        followerTarget: parseInt(followerTarget, 10) || 15000,
-      },
-    });
+        goals: {
+          followerTarget: parseInt(followerTarget, 10) || 15000,
+        },
+      });
+      toast.success("Settings saved", {
+        description: "Your configuration has been updated.",
+      });
+    } catch {
+      toast.error("Failed to save settings", {
+        description: "Please try again.",
+      });
+    }
   };
 
   const handleReset = async () => {
-    await reset();
+    try {
+      await reset();
+      // Update local state to match reset values
+      setTwitchChannel("");
+      setYoutubeChannelId("");
+      setYoutubeVideoId("");
+      setDiscordChannelId("");
+      setFollowerTarget("15000");
+      toast.success("Settings reset", {
+        description: "All settings have been restored to defaults.",
+      });
+    } catch {
+      toast.error("Failed to reset settings", {
+        description: "Please try again.",
+      });
+    }
   };
 
   const hasChanges =
@@ -203,20 +228,40 @@ function SettingsForm({
     followerTarget !== config.goals.followerTarget.toString();
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-4xl pb-24">
+      {/* Sticky Save Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-sm">
+            {error && (
+              <span className="text-destructive">{error}</span>
+            )}
+            {loading && (
+              <span className="text-muted-foreground">Loading...</span>
+            )}
+            {hasChanges && !saving && (
+              <span className="text-muted-foreground">You have unsaved changes</span>
+            )}
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-md transition-all",
+              hasChanges
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            )}
+          >
+            <Save className="h-4 w-4" />
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3">
-          {error && (
-            <span className="text-sm text-destructive">{error}</span>
-          )}
-          {loading && (
-            <span className="text-sm text-muted-foreground">Loading...</span>
-          )}
-          {saving && (
-            <span className="text-sm text-primary">Saving...</span>
-          )}
-        </div>
+        {/* Spacer for any additional header content */}
       </div>
 
       {/* Twitch Section */}
@@ -340,27 +385,12 @@ DISCORD_BOT_TOKEN=`}
       {/* Danger Zone */}
       <Section title="danger zone" icon={RotateCcw} variant="danger" defaultOpen={false}>
         <SettingRow
-          label="save settings"
-          description="Save all changes to the server configuration."
-        >
-          <div className="flex">
-            <PillButton
-              active={hasChanges}
-              onClick={handleSave}
-              variant={hasChanges ? "primary" : "default"}
-            >
-              {saving ? "saving..." : hasChanges ? "save" : "no changes"}
-            </PillButton>
-          </div>
-        </SettingRow>
-
-        <SettingRow
-          label="reset settings"
+          label="reset all settings"
           description="Reset all settings to their default values. This action cannot be undone."
         >
           <div className="flex">
             <PillButton onClick={handleReset} variant="danger" active>
-              reset
+              {saving ? "resetting..." : "reset to defaults"}
             </PillButton>
           </div>
         </SettingRow>

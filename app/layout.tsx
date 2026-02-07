@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Sora, Space_Grotesk } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
 const bodyFont = Sora({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${bodyFont.variable} ${displayFont.variable}`}>
         {children}
+        <Toaster />
       </body>
     </html>
   );

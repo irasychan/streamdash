@@ -18,7 +18,7 @@ export default function ChatPage() {
           <CardTitle className="text-base font-medium">Live Chat Feed</CardTitle>
         </CardHeader>
         <CardContent className="h-[600px]">
-          <ChatContainer />
+          <ChatContainer showDebugInput />
         </CardContent>
       </Card>
     </div>
