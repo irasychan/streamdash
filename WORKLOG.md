@@ -1,26 +1,5 @@
 # Current Work Log
 
-## Recently Completed
-
-### UX Audit + Fixes + Debug Tooling (Feb 8, 2026)
-- [x] UX audit across all pages ([docs/ux-audit.md](docs/ux-audit.md))
-- [x] Settings: sticky save bar, toast feedback, reset UX
-- [x] Stats: use configured channel, status indicator
-- [x] Toast notification system (sonner)
-- [x] Debug chatbox in dashboard chat (multi-platform simulation via SSE)
-- [x] OBS chat widget scrollbar hidden
-
-See: [worklogs/2026-02-08.md](worklogs/2026-02-08.md)
-
-### Local Message Hiding (Jan 25, 2026)
-- [x] Hide messages locally (dashboard shows dimmed, OBS widget filters out)
-- [x] Real-time sync via SSE hide/unhide events
-- [x] API endpoint for hide/unhide/list operations
-
-See: [worklogs/2026-01-25.md](worklogs/2026-01-25.md)
-
----
-
 ## Active Tasks
 
 ### Enhanced Features (Phase 3) - Remaining
@@ -30,8 +9,14 @@ See: [worklogs/2026-01-25.md](worklogs/2026-01-25.md)
 - [ ] Chat UX redesign for moderation workflows (see [chat-ux-redesign.md](docs/chat-ux-redesign.md))
 - [ ] Chat moderation controls (timeout durations, ban) - Twitch only
 - [ ] Message highlighting (mentions, keywords)
-- [ ] Dashboard connection status badges in header
-- [ ] Add clear/flush button to remove debug messages from chat feed and SSE buffer
+- [x] Dashboard connection status badges in header
+- [x] Add clear/flush button to remove debug messages from chat feed and SSE buffer
+
+---
+
+## Bugs
+
+- [x] **Unhide message doesn't restore it in OBS widget** — Widget was removing messages from state on hide, so unhide had nothing to restore. Fixed: widget now keeps messages in state and uses `hiddenMessageIds` filtering only (matching dashboard behavior).
 
 ---
 
@@ -111,3 +96,10 @@ See: [docs/twitch-realtime-architecture.md](docs/twitch-realtime-architecture.md
 ---
 
 *See `worklogs/roadmap.md` for full roadmap and icebox items.*
+
+---
+
+## Archive
+
+- [2026-02-08](worklogs/2026-02-08.md) — UX audit, settings overhaul, debug chat, toast notifications
+- [2026-01-25](worklogs/2026-01-25.md) — Architecture refactor, Zustand, widget fixes, local message hiding

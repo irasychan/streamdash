@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Bug } from "lucide-react";
+import { Bug, Trash2 } from "lucide-react";
 import { cn } from "@/lib/ui/cn";
 import type { ChatPlatform } from "../types/chat";
 
@@ -15,9 +15,10 @@ const PLATFORM_CONFIG: Record<ChatPlatform, { label: string; color: string }> = 
 
 type DebugChatInputProps = {
   onSend: (platform: ChatPlatform, content: string) => void;
+  onFlush?: () => void;
 };
 
-export function DebugChatInput({ onSend }: DebugChatInputProps) {
+export function DebugChatInput({ onSend, onFlush }: DebugChatInputProps) {
   const [text, setText] = useState("");
   const [platform, setPlatform] = useState<ChatPlatform>("twitch");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +71,16 @@ export function DebugChatInput({ onSend }: DebugChatInputProps) {
       >
         Send
       </button>
+      {onFlush && (
+        <button
+          type="button"
+          onClick={onFlush}
+          className="shrink-0 rounded p-1 text-muted-foreground/40 hover:text-destructive transition-colors"
+          title="Clear debug messages"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
     </form>
   );
 }
