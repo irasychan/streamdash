@@ -32,6 +32,22 @@ type DebugRequest = {
 };
 
 /**
+ * DELETE /api/chat/debug - Clear all debug messages from buffer and connected clients
+ */
+export async function DELETE() {
+  try {
+    connectionManager.clearDebugMessages();
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[Chat Debug] Flush error:", error);
+    return NextResponse.json(
+      { ok: false, error: "Failed to flush debug messages" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * POST /api/chat/debug - Inject a fake chat message for testing
  * Broadcasts through SSE so it appears in dashboard AND OBS widgets.
  */

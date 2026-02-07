@@ -101,6 +101,12 @@ export function ChatContainer({
           return;
         }
 
+        // Handle flush-debug event
+        if (data.type === "flush-debug") {
+          setMessages((prev) => prev.filter((msg) => !msg.id.includes("-debug-")));
+          return;
+        }
+
         // Handle hide/unhide events
         if (data.type === "hide" || data.type === "unhide") {
           const hideEvent = data as ChatHideEvent;
@@ -227,6 +233,14 @@ export function ChatContainer({
     }
   }, []);
 
+  const handleDebugFlush = useCallback(async () => {
+    try {
+      await fetch("/api/chat/debug", { method: "DELETE" });
+    } catch (error) {
+      console.error("[Chat Debug] Flush error:", error);
+    }
+  }, []);
+
   const highlightKeywords = (chatPrefs.highlightKeywords ?? [])
     .map((keyword) => keyword.trim())
     .filter(Boolean);
@@ -320,7 +334,7 @@ export function ChatContainer({
         )}
       </div>
 
-      {showDebugInput && <DebugChatInput onSend={handleDebugSend} />}
+      {showDebugInput && <DebugChatInput onSend={handleDebugSend} onFlush={handleDebugFlush} />}
     </div>
   );
 }

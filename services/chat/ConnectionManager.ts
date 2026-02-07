@@ -3,6 +3,7 @@ import type {
   ChatPlatform,
   ChatConnectionStatus,
   ChatHideEvent,
+  ChatFlushDebugEvent,
   SSEClient,
 } from "@/features/chat/types/chat";
 import { TwitchIRC } from "./bridges/TwitchIRC";
@@ -112,16 +113,33 @@ class ConnectionManager {
   }
 
   private broadcastHideEvent(event: ChatHideEvent): void {
+    this.broadcastControlEvent(event);
+  }
+
+  private broadcastControlEvent(event: ChatHideEvent | ChatFlushDebugEvent): void {
     for (const [clientId, client] of this.sseClients.entries()) {
       try {
         client.send(event);
       } catch (error) {
         console.error(
-          `Error sending SSE hide event to client ${clientId}:`,
+          `Error sending SSE control event to client ${clientId}:`,
           error
         );
       }
     }
+  }
+
+  public clearDebugMessages(): void {
+    const before = this.messageBuffer.length;
+    this.messageBuffer = this.messageBuffer.filter((msg) => {
+      if (msg.id.includes("-debug-")) {
+        this.messageIds.delete(msg.id);
+        return false;
+      }
+      return true;
+    });
+    console.log(`[ConnectionManager] Flushed ${before - this.messageBuffer.length} debug messages`);
+    this.broadcastControlEvent({ type: "flush-debug" });
   }
 
   // Twitch connection

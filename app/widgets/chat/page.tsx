@@ -173,6 +173,12 @@ function ChatWidgetContent() {
         const data = JSON.parse(event.data);
         if (data.type === "keepalive") return;
 
+        // Handle flush-debug event
+        if (data.type === "flush-debug") {
+          setMessages((prev) => prev.filter((msg) => !msg.id.includes("-debug-")));
+          return;
+        }
+
         // Handle hide/unhide events
         if (data.type === "hide" || data.type === "unhide") {
           const hideEvent = data as ChatHideEvent;
@@ -185,10 +191,6 @@ function ChatWidgetContent() {
             }
             return next;
           });
-          // Remove hidden message from display
-          if (hideEvent.type === "hide") {
-            setMessages((prev) => prev.filter((msg) => msg.id !== hideEvent.messageId));
-          }
           return;
         }
 
