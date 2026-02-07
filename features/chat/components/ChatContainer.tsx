@@ -1,8 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { ChatMessage as ChatMessageType, ChatModerationAction, ChatHideEvent, ChatPlatform } from "../types/chat";
 import { ChatMessage, densityGapClasses } from "./ChatMessage";
+import { ChatActionBar } from "./ChatActionBar";
+import { BanConfirmDialog } from "./BanConfirmDialog";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { DebugChatInput } from "./DebugChatInput";
 import { demoChatMessages } from "@/lib/demoData";
@@ -32,6 +35,9 @@ export function ChatContainer({
   const [connected, setConnected] = useState(false);
   const [twitchAuthConnected, setTwitchAuthConnected] = useState(false);
   const [twitchUserLogin, setTwitchUserLogin] = useState<string | null>(null);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [banTarget, setBanTarget] = useState<ChatMessageType | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
   const { preferences } = usePreferences();
@@ -141,12 +147,12 @@ export function ChatContainer({
     };
   }, [maxMessages, showDemo]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (paused when a message is selected)
   useEffect(() => {
-    if (autoScrollRef.current && containerRef.current) {
+    if (!selectedMessageId && autoScrollRef.current && containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, selectedMessageId]);
 
   // Detect manual scroll to pause auto-scroll
   const handleScroll = () => {
@@ -158,14 +164,19 @@ export function ChatContainer({
   };
 
   const handleModerate = useCallback(
-    async (message: ChatMessageType, action: ChatModerationAction) => {
+    async (
+      message: ChatMessageType,
+      action: ChatModerationAction,
+      opts?: { durationSeconds?: number; reason?: string }
+    ) => {
       if (message.platform !== "twitch") return;
 
       const payload = {
         platform: "twitch" as const,
         action,
         targetUserId: message.author.id,
-        durationSeconds: action === "timeout" ? 600 : undefined,
+        durationSeconds: opts?.durationSeconds ?? (action === "timeout" ? 600 : undefined),
+        reason: opts?.reason,
         channel: twitchChannel,
       };
 
@@ -178,10 +189,19 @@ export function ChatContainer({
 
         if (!response.ok) {
           const data = await response.json().catch(() => null);
-          console.error("[Chat Moderation] Failed:", data?.error ?? response.statusText);
+          const errorMsg = data?.error ?? response.statusText;
+          console.error("[Chat Moderation] Failed:", errorMsg);
+          toast.error(`Moderation failed: ${errorMsg}`);
+          return;
         }
+
+        const actionLabel = action === "timeout"
+          ? `Timed out ${message.author.displayName}`
+          : `Banned ${message.author.displayName}`;
+        toast.success(actionLabel);
       } catch (error) {
         console.error("[Chat Moderation] Error:", error);
+        toast.error("Moderation request failed");
       }
     },
     [twitchChannel]
@@ -240,6 +260,110 @@ export function ChatContainer({
       console.error("[Chat Debug] Flush error:", error);
     }
   }, []);
+
+  // --- Selection logic ---
+
+  const selectedMessage = useMemo(
+    () => (selectedMessageId ? messages.find((m) => m.id === selectedMessageId) ?? null : null),
+    [selectedMessageId, messages]
+  );
+
+  // Auto-deselect if selected message leaves the array (maxMessages overflow)
+  useEffect(() => {
+    if (selectedMessageId && !messages.some((m) => m.id === selectedMessageId)) {
+      setSelectedMessageId(null);
+    }
+  }, [messages, selectedMessageId]);
+
+  const handleSelectMessage = useCallback((msg: ChatMessageType) => {
+    setSelectedMessageId((prev) => (prev === msg.id ? null : msg.id));
+  }, []);
+
+  const handleDeselect = useCallback(() => {
+    setSelectedMessageId(null);
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip if focus is inside an input/textarea
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if (e.key === "Escape") {
+        setSelectedMessageId(null);
+        return;
+      }
+
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedMessageId((prev) => {
+          if (!prev) {
+            // Select first or last message
+            return e.key === "ArrowDown"
+              ? messages[0]?.id ?? null
+              : messages[messages.length - 1]?.id ?? null;
+          }
+          const idx = messages.findIndex((m) => m.id === prev);
+          if (idx === -1) return null;
+          const nextIdx = e.key === "ArrowDown" ? idx + 1 : idx - 1;
+          if (nextIdx < 0 || nextIdx >= messages.length) return prev;
+          return messages[nextIdx].id;
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [messages]);
+
+  // Scroll selected message into view
+  useEffect(() => {
+    if (!selectedMessageId || !containerRef.current) return;
+    const el = containerRef.current.querySelector(`[data-message-id="${selectedMessageId}"]`);
+    el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [selectedMessageId]);
+
+  // Action bar handlers
+  const handleTimeoutFromBar = useCallback(
+    (seconds: number) => {
+      if (!selectedMessage) return;
+      handleModerate(selectedMessage, "timeout", { durationSeconds: seconds });
+      setSelectedMessageId(null);
+    },
+    [selectedMessage, handleModerate]
+  );
+
+  const handleBanClick = useCallback(() => {
+    if (!selectedMessage) return;
+    setBanTarget(selectedMessage);
+    setBanDialogOpen(true);
+  }, [selectedMessage]);
+
+  const handleConfirmBan = useCallback(
+    (reason?: string) => {
+      if (!banTarget) return;
+      handleModerate(banTarget, "ban", { reason });
+      setBanDialogOpen(false);
+      setBanTarget(null);
+      setSelectedMessageId(null);
+    },
+    [banTarget, handleModerate]
+  );
+
+  const handleHideFromBar = useCallback(() => {
+    if (!selectedMessage) return;
+    handleHide(selectedMessage);
+    setSelectedMessageId(null);
+    toast.success(`Hidden message from ${selectedMessage.author.displayName}`);
+  }, [selectedMessage, handleHide]);
+
+  const handleUnhideFromBar = useCallback(() => {
+    if (!selectedMessage) return;
+    handleUnhide(selectedMessage);
+    setSelectedMessageId(null);
+    toast.success(`Unhidden message from ${selectedMessage.author.displayName}`);
+  }, [selectedMessage, handleUnhide]);
 
   const highlightKeywords = (chatPrefs.highlightKeywords ?? [])
     .map((keyword) => keyword.trim())
@@ -319,20 +443,44 @@ export function ChatContainer({
         ) : (
           <div className={densityGapClasses[chatPrefs.messageDensity]}>
             {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                chatPrefs={chatPrefs}
-                onModerate={twitchAuthConnected ? handleModerate : undefined}
-                onHide={handleHide}
-                onUnhide={handleUnhide}
-                isHighlighted={shouldHighlightMessage(msg)}
-                isHidden={hiddenMessageIds.has(msg.id)}
-              />
+              <div key={msg.id} data-message-id={msg.id}>
+                <ChatMessage
+                  message={msg}
+                  chatPrefs={chatPrefs}
+                  onModerate={twitchAuthConnected ? handleModerate : undefined}
+                  onHide={handleHide}
+                  onUnhide={handleUnhide}
+                  isHighlighted={shouldHighlightMessage(msg)}
+                  isHidden={hiddenMessageIds.has(msg.id)}
+                  isSelected={selectedMessageId === msg.id}
+                  onSelect={handleSelectMessage}
+                />
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {selectedMessage && (
+        <ChatActionBar
+          selectedMessage={selectedMessage}
+          onTimeout={handleTimeoutFromBar}
+          onBan={handleBanClick}
+          onHide={handleHideFromBar}
+          onUnhide={handleUnhideFromBar}
+          onDeselect={handleDeselect}
+          isHidden={hiddenMessageIds.has(selectedMessage.id)}
+          isTwitchAuthed={twitchAuthConnected}
+        />
+      )}
+
+      <BanConfirmDialog
+        open={banDialogOpen}
+        onOpenChange={setBanDialogOpen}
+        onConfirm={handleConfirmBan}
+        username={banTarget?.author.displayName ?? ""}
+        platform={banTarget?.platform ?? "twitch"}
+      />
 
       {showDebugInput && <DebugChatInput onSend={handleDebugSend} onFlush={handleDebugFlush} />}
     </div>
