@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChatMessage as ChatMessageType, ChatModerationAction, ChatHideEvent } from "../types/chat";
+import type { ChatMessage as ChatMessageType, ChatModerationAction, ChatHideEvent, ChatPlatform } from "../types/chat";
 import { ChatMessage, densityGapClasses } from "./ChatMessage";
 import { ConnectionStatus } from "./ConnectionStatus";
+import { DebugChatInput } from "./DebugChatInput";
 import { demoChatMessages } from "@/lib/demoData";
 import { cn } from "@/lib/ui/cn";
 import { usePreferences } from "@/features/preferences/usePreferences";
@@ -14,12 +15,14 @@ import type { ChatDisplayPreferences } from "@/features/preferences/types";
 type ChatContainerProps = {
   maxMessages?: number;
   showDemo?: boolean;
+  showDebugInput?: boolean;
   className?: string;
 };
 
 export function ChatContainer({
   maxMessages = 100,
   showDemo = true,
+  showDebugInput = false,
   className,
 }: ChatContainerProps) {
   const [messages, setMessages] = useState<ChatMessageType[]>(
@@ -212,6 +215,18 @@ export function ChatContainer({
     }
   }, []);
 
+  const handleDebugSend = useCallback(async (platform: ChatPlatform, content: string) => {
+    try {
+      await fetch("/api/chat/debug", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, content }),
+      });
+    } catch (error) {
+      console.error("[Chat Debug] Error:", error);
+    }
+  }, []);
+
   const highlightKeywords = (chatPrefs.highlightKeywords ?? [])
     .map((keyword) => keyword.trim())
     .filter(Boolean);
@@ -304,6 +319,8 @@ export function ChatContainer({
           </div>
         )}
       </div>
+
+      {showDebugInput && <DebugChatInput onSend={handleDebugSend} />}
     </div>
   );
 }

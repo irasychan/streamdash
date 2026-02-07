@@ -244,8 +244,8 @@ function ChatWidgetContent() {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="h-[calc(100vh-2rem)] overflow-y-auto p-3 space-y-0.5"
-          style={{ scrollbarWidth: "thin" }}
+          className="h-[calc(100vh-2rem)] overflow-y-auto p-3 space-y-0.5 [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: "none" }}
         >
           {visibleMessages.map((msg) => (
             <ChatMessage
