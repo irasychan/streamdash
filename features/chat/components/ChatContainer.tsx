@@ -32,6 +32,7 @@ export function ChatContainer({
     showDemo ? demoChatMessages : []
   );
   const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
+  const [moderatedUserIds, setModeratedUserIds] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
   const [twitchAuthConnected, setTwitchAuthConnected] = useState(false);
   const [twitchUserLogin, setTwitchUserLogin] = useState<string | null>(null);
@@ -195,6 +196,7 @@ export function ChatContainer({
           return;
         }
 
+        setModeratedUserIds((prev) => new Set([...prev, message.author.id]));
         const actionLabel = action === "timeout"
           ? `Timed out ${message.author.displayName}`
           : `Banned ${message.author.displayName}`;
@@ -286,9 +288,9 @@ export function ChatContainer({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip if focus is inside an input/textarea
+      // Skip if focus is inside an input/textarea/select
       const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       if (e.key === "Escape") {
         setSelectedMessageId(null);
@@ -310,12 +312,53 @@ export function ChatContainer({
           if (nextIdx < 0 || nextIdx >= messages.length) return prev;
           return messages[nextIdx].id;
         });
+        return;
+      }
+
+      // Moderation shortcuts — only when a message is selected
+      if (!selectedMessageId) return;
+
+      if (e.key === "h" || e.key === "H") {
+        e.preventDefault();
+        setSelectedMessageId((prev) => {
+          const msg = prev ? messages.find((m) => m.id === prev) ?? null : null;
+          if (!msg) return prev;
+          if (hiddenMessageIds.has(msg.id)) {
+            handleUnhide(msg);
+            toast.success(`Unhidden message from ${msg.author.displayName}`);
+          } else {
+            handleHide(msg);
+            toast.success(`Hidden message from ${msg.author.displayName}`);
+          }
+          return null;
+        });
+        return;
+      }
+
+      if ((e.key === "t" || e.key === "T") && twitchAuthConnected) {
+        e.preventDefault();
+        const msg = messages.find((m) => m.id === selectedMessageId) ?? null;
+        if (msg && msg.platform === "twitch") {
+          handleModerate(msg, "timeout", { durationSeconds: 600 });
+          setSelectedMessageId(null);
+        }
+        return;
+      }
+
+      if ((e.key === "b" || e.key === "B") && twitchAuthConnected) {
+        e.preventDefault();
+        const msg = messages.find((m) => m.id === selectedMessageId) ?? null;
+        if (msg && msg.platform === "twitch") {
+          setBanTarget(msg);
+          setBanDialogOpen(true);
+        }
+        return;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [messages]);
+  }, [messages, selectedMessageId, hiddenMessageIds, twitchAuthConnected, handleHide, handleUnhide, handleModerate]);
 
   // Scroll selected message into view
   useEffect(() => {
@@ -452,6 +495,7 @@ export function ChatContainer({
                   onUnhide={handleUnhide}
                   isHighlighted={shouldHighlightMessage(msg)}
                   isHidden={hiddenMessageIds.has(msg.id)}
+                  isModerated={moderatedUserIds.has(msg.author.id)}
                   isSelected={selectedMessageId === msg.id}
                   onSelect={handleSelectMessage}
                 />

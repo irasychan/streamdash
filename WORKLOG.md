@@ -6,11 +6,12 @@
 **Priority:** High
 **Status:** Active
 
-- [ ] Chat UX redesign for moderation workflows (see [chat-ux-redesign.md](docs/chat-ux-redesign.md))
-- [ ] Chat moderation controls (timeout durations, ban) - Twitch only
-- [ ] Message highlighting (mentions, keywords)
+- [x] Chat UX redesign for moderation workflows (see [chat-ux-redesign.md](docs/chat-ux-redesign.md))
+- [x] Chat moderation controls (timeout durations, ban) - Twitch only
+- [x] Message highlighting (mentions, keywords)
 - [x] Dashboard connection status badges in header
 - [x] Add clear/flush button to remove debug messages from chat feed and SSE buffer
+- [ ] Hidden messages summary counter (step 6 of UX redesign — collapsible "N messages hidden" in chat header)
 
 ---
 
@@ -77,21 +78,10 @@ See: [docs/twitch-realtime-architecture.md](docs/twitch-realtime-architecture.md
 
 ### Active Task Context (Phase 3)
 
-**Chat UX Redesign**
-- Current chat UI: [app/dashboard/chat/page.tsx](app/dashboard/chat/page.tsx)
-- Chat message component: [features/chat/components/ChatMessage.tsx](features/chat/components/ChatMessage.tsx)
-- Consider: hover actions, user context panels, quick mod controls, keyboard shortcuts
-
-**Chat Moderation Controls (Twitch only)**
-- Twitch API: `POST /moderation/bans` for timeout/ban (requires `moderator:manage:banned_users` scope)
-- Current Twitch IRC client: [services/chat/bridges/TwitchIRC.ts](services/chat/bridges/TwitchIRC.ts)
-- Chat SSE endpoint: [app/api/chat/sse/route.ts](app/api/chat/sse/route.ts)
-- Hidden messages API: [app/api/chat/hide/route.ts](app/api/chat/hide/route.ts) - pattern to follow
-- Debug messages API: [app/api/chat/debug/route.ts](app/api/chat/debug/route.ts)
-
-**Message Highlighting**
-- User preferences store: localStorage via [features/preferences/usePreferences.ts](features/preferences/usePreferences.ts)
-- Consider: mention detection (@username), keyword list in preferences
+**Hidden Messages Counter** (step 6 of chat-ux-redesign.md)
+- Add collapsible "N messages hidden" counter to the chat header area
+- Clicking toggles showing/hiding those messages in the feed
+- Components: `ChatContainer.tsx` (state), chat header area
 
 ---
 
@@ -101,5 +91,6 @@ See: [docs/twitch-realtime-architecture.md](docs/twitch-realtime-architecture.md
 
 ## Archive
 
+- [2026-03-07](worklogs/2026-03-07.md) — Chat moderation polish, auth nudge, post-action visual state, UX redesign research; Chat UX redesign (steps 1–5), message highlighting
 - [2026-02-08](worklogs/2026-02-08.md) — UX audit, settings overhaul, debug chat, toast notifications
 - [2026-01-25](worklogs/2026-01-25.md) — Architecture refactor, Zustand, widget fixes, local message hiding

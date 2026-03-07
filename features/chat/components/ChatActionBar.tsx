@@ -1,13 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PlatformBadge } from "./PlatformBadge";
+import { TimeoutPicker } from "./TimeoutPicker";
 import type { ChatMessage } from "../types/chat";
 
 type ChatActionBarProps = {
@@ -21,12 +16,6 @@ type ChatActionBarProps = {
   isTwitchAuthed: boolean;
 };
 
-const TIMEOUT_OPTIONS = [
-  { label: "1 min", seconds: 60 },
-  { label: "10 min", seconds: 600 },
-  { label: "1 hour", seconds: 3600 },
-] as const;
-
 export function ChatActionBar({
   selectedMessage,
   onTimeout,
@@ -38,26 +27,25 @@ export function ChatActionBar({
   isTwitchAuthed,
 }: ChatActionBarProps) {
   const isTwitch = selectedMessage.platform === "twitch";
-  const showModerationActions = isTwitch && isTwitchAuthed;
 
   return (
-    <div className="sticky bottom-0 z-10 flex items-center gap-2 border-t border-border/40 bg-background/80 backdrop-blur-sm px-3 py-2">
-      {/* User info */}
-      <div className="flex items-center gap-2 mr-auto min-w-0">
-        <PlatformBadge platform={selectedMessage.platform} />
-        <span
-          className="text-sm font-semibold truncate"
-          style={{
-            color:
-              selectedMessage.author.color || "hsl(var(--foreground))",
-          }}
-        >
-          {selectedMessage.author.displayName}
-        </span>
-      </div>
+    <div className="sticky bottom-0 z-10 border-t border-border/40 bg-background/80 backdrop-blur-sm px-3 py-2 space-y-1.5">
+      {/* Row 1: context + hide/unhide + close */}
+      <div className="flex items-center gap-2">
+        {/* User info */}
+        <div className="flex items-center gap-2 mr-auto min-w-0">
+          <PlatformBadge platform={selectedMessage.platform} />
+          <span
+            className="text-sm font-semibold truncate"
+            style={{
+              color:
+                selectedMessage.author.color || "hsl(var(--foreground))",
+            }}
+          >
+            {selectedMessage.author.displayName}
+          </span>
+        </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1.5">
         {/* Hide / Unhide */}
         {isHidden ? (
           <Button
@@ -79,70 +67,65 @@ export function ChatActionBar({
           </Button>
         )}
 
-        {/* Timeout dropdown (Twitch only) */}
-        {showModerationActions && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs text-amber-400 hover:text-amber-300"
-              >
-                Timeout
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="top">
-              {TIMEOUT_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.seconds}
-                  onClick={() => onTimeout(opt.seconds)}
-                >
-                  {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-
-        {/* Ban (Twitch only) */}
-        {showModerationActions && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBan}
-            className="h-7 text-xs text-rose-400 hover:text-rose-300"
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={onDeselect}
+          className="rounded p-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-white/5"
+          title="Deselect (Esc)"
+          aria-label="Deselect message"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
           >
-            Ban
-          </Button>
-        )}
+            <path d="M1 1l12 12M13 1L1 13" />
+          </svg>
+        </button>
       </div>
 
-      {/* Keyboard hints */}
-      <span className="hidden sm:inline-flex text-[10px] text-muted-foreground/50 ml-2 whitespace-nowrap">
-        <kbd className="font-mono">↑↓</kbd>&nbsp;navigate&nbsp;&middot;&nbsp;
-        <kbd className="font-mono">Esc</kbd>&nbsp;deselect
-      </span>
+      {/* Row 2: moderation actions + keyboard hints */}
+      <div className="flex items-center gap-2">
+        {isTwitch && isTwitchAuthed && (
+          <>
+            <TimeoutPicker onTimeout={onTimeout} />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBan}
+              className="h-7 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-400/10"
+            >
+              Ban
+            </Button>
+            <span className="hidden sm:inline-flex ml-auto text-[10px] text-muted-foreground/50 whitespace-nowrap">
+              <kbd className="font-mono">H</kbd>&nbsp;hide&nbsp;&middot;&nbsp;
+              <kbd className="font-mono">T</kbd>&nbsp;timeout&nbsp;&middot;&nbsp;
+              <kbd className="font-mono">B</kbd>&nbsp;ban&nbsp;&middot;&nbsp;
+              <kbd className="font-mono">Esc</kbd>&nbsp;deselect
+            </span>
+          </>
+        )}
 
-      {/* Close button (mobile / always accessible) */}
-      <button
-        type="button"
-        onClick={onDeselect}
-        className="ml-1 rounded p-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-white/5"
-        title="Deselect (Esc)"
-        aria-label="Deselect message"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
-          <path d="M1 1l12 12M13 1L1 13" />
-        </svg>
-      </button>
+        {isTwitch && !isTwitchAuthed && (
+          <a
+            href="/api/twitch/auth"
+            className="text-[11px] text-muted-foreground/60 hover:text-primary/80 transition-colors whitespace-nowrap"
+          >
+            Connect Twitch to unlock moderation →
+          </a>
+        )}
+
+        {!isTwitch && (
+          <span className="text-[11px] text-muted-foreground/40 whitespace-nowrap">
+            Moderation available for Twitch only
+          </span>
+        )}
+      </div>
     </div>
   );
 }

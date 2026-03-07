@@ -22,6 +22,10 @@ type BanConfirmDialogProps = {
   platform: ChatPlatform;
 };
 
+const MAX_REASON_LENGTH = 500;
+
+const REASON_PRESETS = ["Spam", "Harassment", "Advertising", "Other"] as const;
+
 export function BanConfirmDialog({
   open,
   onOpenChange,
@@ -39,6 +43,10 @@ export function BanConfirmDialog({
   const handleOpenChange = (next: boolean) => {
     if (!next) setReason("");
     onOpenChange(next);
+  };
+
+  const handlePreset = (preset: string) => {
+    setReason(preset);
   };
 
   return (
@@ -62,14 +70,34 @@ export function BanConfirmDialog({
           >
             Reason (optional)
           </label>
+
+          {/* Preset reason chips */}
+          <div className="flex flex-wrap gap-1.5">
+            {REASON_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => handlePreset(preset)}
+                className="rounded-full border border-border/60 px-2.5 py-0.5 text-xs text-muted-foreground hover:border-border hover:text-foreground transition-colors"
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+
           <Textarea
             id="ban-reason"
             placeholder="Enter a reason for the ban..."
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={(e) => setReason(e.target.value.slice(0, MAX_REASON_LENGTH))}
             className="resize-none"
             rows={2}
           />
+
+          {/* Character count */}
+          <div className="text-right text-[11px] text-muted-foreground/50">
+            {reason.length}/{MAX_REASON_LENGTH}
+          </div>
         </div>
 
         <DialogFooter>

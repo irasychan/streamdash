@@ -20,6 +20,7 @@ type ChatMessageProps = {
   onUnhide?: (message: ChatMessageType) => void;
   isHighlighted?: boolean;
   isHidden?: boolean;
+  isModerated?: boolean;
   isSelected?: boolean;
   onSelect?: (message: ChatMessageType) => void;
 };
@@ -95,6 +96,7 @@ export function ChatMessage({
   onUnhide,
   isHighlighted,
   isHidden = false,
+  isModerated = false,
   isSelected = false,
   onSelect,
 }: ChatMessageProps) {
@@ -111,6 +113,8 @@ export function ChatMessage({
   const fontFamily = chatPrefs?.fontFamily || undefined;
   const messageLayout = chatPrefs?.messageLayout ?? "inline";
   const textAlign = chatPrefs?.textAlign ?? "left";
+  const highlightMentions = chatPrefs?.highlightMentions ?? true;
+  const highlightKeywords = chatPrefs?.highlightKeywords ?? [];
 
   const highlighted = isHighlighted ?? message.isHighlighted;
   // When onSelect is provided (dashboard mode), suppress hover buttons — the action bar handles it
@@ -197,6 +201,7 @@ export function ChatMessage({
           highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
           isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
           isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
+          isModerated && !isHidden && "opacity-40 bg-rose-500/5 ring-1 ring-rose-500/20",
           isSelected && "ring-2 ring-primary/60 bg-primary/10",
           onSelect && "cursor-pointer",
           fontSizeClasses[fontSize],
@@ -263,7 +268,7 @@ export function ChatMessage({
               emotes,
               fontSize,
               thirdPartyEmotes,
-              { showTwitchEmotes, showThirdPartyEmotes }
+              { showTwitchEmotes, showThirdPartyEmotes, highlightMentions, highlightKeywords }
             )}
           </span>
         </span>
@@ -354,7 +359,7 @@ export function ChatMessage({
             emotes,
             fontSize,
             thirdPartyEmotes,
-            { showTwitchEmotes, showThirdPartyEmotes }
+            { showTwitchEmotes, showThirdPartyEmotes, highlightMentions, highlightKeywords }
           )}
         </span>
       </div>

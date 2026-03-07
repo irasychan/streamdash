@@ -13,7 +13,6 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] YouTube Data API integration (subscribers, views)
 - [x] Dashboard page with stats display
 - [x] OBS widgets: stats widget, follower goal widget
-
 ## Phase 2: Chat Aggregator (Completed)
 - [x] Unified chat types and data structures
 - [x] Server-Sent Events (SSE) streaming endpoint
@@ -50,6 +49,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [x] Local message hiding (hide from OBS widget, visible in dashboard - Jan 25, 2026)
 - [x] Debug chat input in dashboard with multi-platform simulation (Feb 8, 2026)
 - [x] OBS chat widget scrollbar hidden for cleaner overlay (Feb 8, 2026)
+- [x] Chat moderation controls - timeout/ban via Twitch Helix API (Mar 7, 2026)
 
 ## Phase 3.1: SQLite Persistence (Planned)
 - [ ] Define SQLite schema for config, chat, moderation
@@ -59,8 +59,10 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [ ] Store moderation actions (hide/ban/timeout) with audit trail
 
 ## Phase 3.2: Moderation + Chat Experience (Planned)
-- [ ] Chat moderation controls (timeout, ban)
-- [ ] Message highlighting (mentions, keywords)
+- [x] Chat moderation controls (timeout, ban) — Mar 7, 2026
+- [x] Chat UX redesign — two-row action bar, H/T/B shortcuts, inline timeout picker, platform gating, ban dialog presets — Mar 7, 2026
+- [x] Message highlighting (mentions, keywords) — Mar 7, 2026
+- [ ] Hidden messages summary counter (step 6 of chat-ux-redesign.md)
 - [ ] Live chat feed improvements (filters, search, load more)
 - [ ] Chatter focus view (profile, join time, message history)
 
@@ -93,6 +95,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [ ] Secrets management for hosted environments
 
 ## Icebox / Backlog
+- [ ] Evaluate docs site migration (Docusaurus/MkDocs/Nextra or GitHub Pages) to replace GitHub Wiki — wiki tends to go stale outside the PR workflow
 - [ ] Chat message sending (bi-directional)
 - [ ] Multiple Twitch channel monitoring
 - [ ] Multiple YouTube channel monitoring

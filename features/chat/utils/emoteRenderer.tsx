@@ -25,7 +25,80 @@ type MessageSegment =
 type EmoteRenderOptions = {
   showTwitchEmotes?: boolean;
   showThirdPartyEmotes?: boolean;
+  highlightMentions?: boolean;
+  highlightKeywords?: string[];
 };
+
+/**
+ * Split a plain text string into React nodes, wrapping @mention patterns and
+ * keyword matches with styled highlight spans.
+ *
+ * Returns a single string when no highlights are needed (avoids allocations).
+ */
+export function highlightText(
+  text: string,
+  keywords: string[],
+  highlightMentions: boolean
+): ReactNode {
+  // Build combined regex parts
+  const parts: string[] = [];
+
+  if (highlightMentions) {
+    parts.push("@\\w+");
+  }
+
+  for (const kw of keywords) {
+    if (kw) {
+      parts.push(kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    }
+  }
+
+  if (parts.length === 0) {
+    return text;
+  }
+
+  const regex = new RegExp(`(${parts.join("|")})`, "gi");
+  const segments = text.split(regex);
+
+  if (segments.length === 1) {
+    return text;
+  }
+
+  const keywordsLower = keywords.map((k) => k.toLowerCase());
+
+  return segments.map((segment, i) => {
+    if (!segment) return null;
+
+    const segLower = segment.toLowerCase();
+
+    const isMention = highlightMentions && segment.startsWith("@");
+    const isKeyword = keywordsLower.some((kw) => kw === segLower);
+
+    if (isMention) {
+      return (
+        <span
+          key={i}
+          className="text-primary font-semibold bg-primary/10 rounded px-0.5"
+        >
+          {segment}
+        </span>
+      );
+    }
+
+    if (isKeyword) {
+      return (
+        <span
+          key={i}
+          className="text-accent font-semibold bg-accent/10 rounded px-0.5"
+        >
+          {segment}
+        </span>
+      );
+    }
+
+    return segment;
+  });
+}
 
 /**
  * Split message content into text and emote segments based on emote positions
@@ -111,11 +184,24 @@ export function renderMessageWithEmotes(
   thirdPartyEmotes?: Map<string, ThirdPartyEmote>,
   options: EmoteRenderOptions = {}
 ): ReactNode {
-  const { showTwitchEmotes = true, showThirdPartyEmotes = true } = options;
+  const {
+    showTwitchEmotes = true,
+    showThirdPartyEmotes = true,
+    highlightMentions = false,
+    highlightKeywords = [],
+  } = options;
 
-  // If all emotes are disabled, just return plain text
+  const needsHighlight = highlightMentions || highlightKeywords.length > 0;
+
+  // If all emotes are disabled, just return plain text (possibly highlighted)
   if (!showTwitchEmotes && !showThirdPartyEmotes) {
-    return <span>{content}</span>;
+    return (
+      <span>
+        {needsHighlight
+          ? highlightText(content, highlightKeywords, highlightMentions)
+          : content}
+      </span>
+    );
   }
 
   // First pass: parse native Twitch emotes (only if enabled)
@@ -141,7 +227,13 @@ export function renderMessageWithEmotes(
 
   return finalSegments.map((segment, index) => {
     if (segment.type === "text") {
-      return <span key={index}>{segment.content}</span>;
+      return (
+        <span key={index}>
+          {needsHighlight
+            ? highlightText(segment.content, highlightKeywords, highlightMentions)
+            : segment.content}
+        </span>
+      );
     }
 
     if (segment.type === "emote") {
