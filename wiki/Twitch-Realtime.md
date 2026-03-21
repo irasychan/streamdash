@@ -1,4 +1,4 @@
-# Twitch Real-time Architecture
+# Twitch Realtime
 
 Hybrid approach: Twitch EventSub WebSocket for real-time events + slow polling for aggregate stats.
 
