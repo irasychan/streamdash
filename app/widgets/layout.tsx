@@ -23,11 +23,7 @@ function WidgetLayoutContent({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export default function WidgetsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function WidgetsLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={null}>
       <WidgetLayoutContent>{children}</WidgetLayoutContent>

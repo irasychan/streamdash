@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Tv, Youtube, MessageCircle, Target, Key, RotateCcw, Save } from "lucide-react";
+import {
+  ChevronDown,
+  Tv,
+  Youtube,
+  MessageCircle,
+  Target,
+  Key,
+  RotateCcw,
+  Save,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useConfig } from "@/features/config/useConfig";
@@ -40,24 +49,21 @@ function Section({
     <div className="mb-8">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center gap-3 text-left group"
+        className="group flex w-full items-center gap-3 text-left"
       >
         <ChevronDown
           className={cn(
             "h-5 w-5 text-muted-foreground transition-transform",
-            !isOpen && "-rotate-90"
+            !isOpen && "-rotate-90",
           )}
         />
         <Icon
-          className={cn(
-            "h-5 w-5",
-            variant === "danger" ? "text-destructive" : "text-primary"
-          )}
+          className={cn("h-5 w-5", variant === "danger" ? "text-destructive" : "text-primary")}
         />
         <span
           className={cn(
             "text-xl font-medium tracking-wide",
-            variant === "danger" ? "text-destructive" : "text-foreground/80"
+            variant === "danger" ? "text-destructive" : "text-foreground/80",
           )}
         >
           {title}
@@ -82,14 +88,12 @@ function SettingRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-8 py-4">
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="h-4 w-4 text-muted-foreground/60" />}
           <span className="text-sm text-muted-foreground">{label}</span>
         </div>
-        {description && (
-          <p className="mt-1 text-sm text-foreground/70">{description}</p>
-        )}
+        {description && <p className="mt-1 text-sm text-foreground/70">{description}</p>}
       </div>
       <div className="flex-shrink-0">{children}</div>
     </div>
@@ -112,13 +116,13 @@ function PillButton({
     <button
       onClick={onClick}
       className={cn(
-        "px-4 py-2 text-sm font-medium transition-all border",
+        "border px-4 py-2 text-sm font-medium transition-all",
         "first:rounded-l-md last:rounded-r-md",
         active
           ? variant === "danger"
-            ? "bg-destructive/20 border-destructive text-destructive"
-            : "bg-primary/20 border-primary text-primary"
-          : "bg-transparent border-border/50 text-muted-foreground hover:border-border hover:text-foreground"
+            ? "border-destructive bg-destructive/20 text-destructive"
+            : "border-primary bg-primary/20 text-primary"
+          : "border-border/50 bg-transparent text-muted-foreground hover:border-border hover:text-foreground",
       )}
     >
       {children}
@@ -147,33 +151,24 @@ function SettingInput({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       disabled={disabled}
-      className="w-64 bg-transparent border-border/50 focus:border-primary text-foreground placeholder:text-muted-foreground/50"
+      className="w-64 border-border/50 bg-transparent text-foreground placeholder:text-muted-foreground/50 focus:border-primary"
     />
   );
 }
 
-function SettingsForm({
-  config,
-  loading,
-  saving,
-  error,
-  update,
-  reset,
-}: SettingsFormProps) {
-  const [twitchChannel, setTwitchChannel] = useState(
-    () => config.platforms.twitch.defaultChannel
-  );
+function SettingsForm({ config, loading, saving, error, update, reset }: SettingsFormProps) {
+  const [twitchChannel, setTwitchChannel] = useState(() => config.platforms.twitch.defaultChannel);
   const [youtubeChannelId, setYoutubeChannelId] = useState(
-    () => config.platforms.youtube.defaultChannelId
+    () => config.platforms.youtube.defaultChannelId,
   );
   const [youtubeVideoId, setYoutubeVideoId] = useState(
-    () => config.platforms.youtube.defaultVideoId
+    () => config.platforms.youtube.defaultVideoId,
   );
   const [discordChannelId, setDiscordChannelId] = useState(
-    () => config.platforms.discord.defaultChannelId
+    () => config.platforms.discord.defaultChannelId,
   );
-  const [followerTarget, setFollowerTarget] = useState(
-    () => config.goals.followerTarget.toString()
+  const [followerTarget, setFollowerTarget] = useState(() =>
+    config.goals.followerTarget.toString(),
   );
 
   const handleSave = async () => {
@@ -231,14 +226,10 @@ function SettingsForm({
     <div className="max-w-4xl pb-24">
       {/* Sticky Save Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3 text-sm">
-            {error && (
-              <span className="text-destructive">{error}</span>
-            )}
-            {loading && (
-              <span className="text-muted-foreground">Loading...</span>
-            )}
+            {error && <span className="text-destructive">{error}</span>}
+            {loading && <span className="text-muted-foreground">Loading...</span>}
             {hasChanges && !saving && (
               <span className="text-muted-foreground">You have unsaved changes</span>
             )}
@@ -247,10 +238,10 @@ function SettingsForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             className={cn(
-              "flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-md transition-all",
+              "flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium transition-all",
               hasChanges
                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
+                : "cursor-not-allowed bg-muted text-muted-foreground",
             )}
           >
             <Save className="h-4 w-4" />
@@ -260,9 +251,7 @@ function SettingsForm({
       </div>
 
       {/* Header */}
-      <div className="mb-8">
-        {/* Spacer for any additional header content */}
-      </div>
+      <div className="mb-8">{/* Spacer for any additional header content */}</div>
 
       {/* Twitch Section */}
       <Section title="twitch" icon={Tv}>
@@ -284,7 +273,7 @@ function SettingsForm({
         >
           <Link
             href="/api/twitch/auth"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-border/50 rounded-md text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+            className="inline-flex items-center gap-2 rounded-md border border-border/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
           >
             connect
           </Link>
@@ -364,11 +353,12 @@ function SettingsForm({
       {/* Environment Variables Section */}
       <Section title="environment" icon={Key} defaultOpen={false}>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground mb-4">
-            Required API credentials. Set these in your <code className="text-primary">.env.local</code> file.
+          <p className="mb-4 text-sm text-muted-foreground">
+            Required API credentials. Set these in your{" "}
+            <code className="text-primary">.env.local</code> file.
           </p>
-          <pre className="text-xs text-muted-foreground/70 font-mono leading-relaxed">
-{`TWITCH_CLIENT_ID=
+          <pre className="font-mono text-xs leading-relaxed text-muted-foreground/70">
+            {`TWITCH_CLIENT_ID=
 TWITCH_CLIENT_SECRET=
 
 YOUTUBE_API_KEY=

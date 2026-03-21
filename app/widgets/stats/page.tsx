@@ -12,22 +12,16 @@ type WidgetStats = typeof demoStats;
 function StatsWidgetContent() {
   const [stats, setStats] = useState<WidgetStats>(demoStats);
   const searchParams = useSearchParams();
-  const channel = useMemo(
-    () => searchParams.get("channel") ?? demoStats.channel,
-    [searchParams]
-  );
+  const channel = useMemo(() => searchParams.get("channel") ?? demoStats.channel, [searchParams]);
   const youtubeChannelId = useMemo(
     () => searchParams.get("youtubeChannelId") ?? demoStats.youtubeChannelId,
-    [searchParams]
+    [searchParams],
   );
   const youtubeHandle = useMemo(
     () => searchParams.get("youtubeHandle") ?? searchParams.get("handle") ?? "",
-    [searchParams]
+    [searchParams],
   );
-  const transparent = useMemo(
-    () => searchParams.get("transparent") === "true",
-    [searchParams]
-  );
+  const transparent = useMemo(() => searchParams.get("transparent") === "true", [searchParams]);
 
   useEffect(() => {
     let isMounted = true;
@@ -38,7 +32,7 @@ function StatsWidgetContent() {
         const youtubeResponse = await fetch(
           youtubeHandle
             ? "/api/youtube?handle=" + youtubeHandle
-            : "/api/youtube?channelId=" + youtubeChannelId
+            : "/api/youtube?channelId=" + youtubeChannelId,
         );
         const twitchData = await twitchResponse.json();
         const youtubeData = await youtubeResponse.json();
@@ -76,10 +70,8 @@ function StatsWidgetContent() {
           : "border-primary/25 bg-background/75 shadow-[0_0_0_1px_rgba(125,207,255,0.22),0_10px_30px_rgba(247,118,142,0.18)]"
       }
     >
-      <CardContent className="pt-5 pb-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Stream pulse
-        </p>
+      <CardContent className="pb-4 pt-5">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Stream pulse</p>
         <div className="mt-3 flex justify-between gap-4">
           <div>
             <p className="font-display text-4xl text-foreground">
@@ -89,9 +81,7 @@ function StatsWidgetContent() {
           </div>
           <Separator orientation="vertical" className="h-auto bg-primary/20" />
           <div>
-            <p className="font-display text-4xl text-foreground">
-              {stats.subs.toLocaleString()}
-            </p>
+            <p className="font-display text-4xl text-foreground">{stats.subs.toLocaleString()}</p>
             <p className="mt-1 text-sm text-muted-foreground">Active subs</p>
           </div>
           <Separator orientation="vertical" className="h-auto bg-primary/20" />
@@ -102,9 +92,7 @@ function StatsWidgetContent() {
             <p className="mt-1 text-sm text-muted-foreground">YouTube subs</p>
           </div>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Channel: {stats.channel}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">Channel: {stats.channel}</p>
       </CardContent>
     </Card>
   );
@@ -113,7 +101,7 @@ function StatsWidgetContent() {
 function StatsWidgetSkeleton() {
   return (
     <Card className="border-primary/25 bg-background/75">
-      <CardContent className="pt-5 pb-4">
+      <CardContent className="pb-4 pt-5">
         <Skeleton className="h-3 w-24" />
         <div className="mt-3 flex justify-between gap-4">
           <div>

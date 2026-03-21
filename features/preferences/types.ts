@@ -1,7 +1,7 @@
 /**
  * User preferences schema for StreamDash.
  * Persisted to localStorage (browser-specific, no server sync).
- * 
+ *
  * These are visual/UX preferences that may vary per device/browser,
  * as opposed to StreamDashConfig which syncs across sessions.
  */
@@ -14,7 +14,15 @@ export type TimestampFormat = "hidden" | "relative" | "absolute";
 export type UsernameColorMode = "platform" | "theme" | "custom";
 export type MessageLayout = "inline" | "inline-wrap" | "stacked";
 export type TextAlign = "left" | "center" | "right";
-export type MessageAnimation = "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce";
+export type MessageAnimation =
+  | "none"
+  | "fade"
+  | "slide-left"
+  | "slide-right"
+  | "slide-up"
+  | "slide-down"
+  | "scale"
+  | "bounce";
 
 export type ChatDisplayPreferences = {
   /** Font size for chat messages */
@@ -47,13 +55,13 @@ export type ChatDisplayPreferences = {
 
 // --- Theme Preferences ---
 
-export type ThemePreset = 
-  | "tokyo-night"   // Current default - dark with neon accents
-  | "midnight"      // Deep black, minimal color
-  | "cyberpunk"     // High contrast neon
-  | "forest"        // Dark green tones
-  | "sunset"        // Warm orange/pink
-  | "monochrome";   // Grayscale
+export type ThemePreset =
+  | "tokyo-night" // Current default - dark with neon accents
+  | "midnight" // Deep black, minimal color
+  | "cyberpunk" // High contrast neon
+  | "forest" // Dark green tones
+  | "sunset" // Warm orange/pink
+  | "monochrome"; // Grayscale
 
 export type ThemePreferences = {
   /** Active theme preset */
@@ -120,7 +128,10 @@ export type ThemeColors = {
   neonGreen: string;
 };
 
-export const THEME_PRESETS: Record<ThemePreset, { name: string; description: string; colors: ThemeColors }> = {
+export const THEME_PRESETS: Record<
+  ThemePreset,
+  { name: string; description: string; colors: ThemeColors }
+> = {
   "tokyo-night": {
     name: "Tokyo Night",
     description: "Dark theme with vibrant neon accents",
@@ -142,7 +153,7 @@ export const THEME_PRESETS: Record<ThemePreset, { name: string; description: str
       neonGreen: "#9ece6a",
     },
   },
-  "midnight": {
+  midnight: {
     name: "Midnight",
     description: "Deep black with subtle accents",
     colors: {
@@ -163,7 +174,7 @@ export const THEME_PRESETS: Record<ThemePreset, { name: string; description: str
       neonGreen: "#4ade80",
     },
   },
-  "cyberpunk": {
+  cyberpunk: {
     name: "Cyberpunk",
     description: "High contrast with electric colors",
     colors: {
@@ -184,7 +195,7 @@ export const THEME_PRESETS: Record<ThemePreset, { name: string; description: str
       neonGreen: "#00ff00",
     },
   },
-  "forest": {
+  forest: {
     name: "Forest",
     description: "Dark green natural tones",
     colors: {
@@ -205,7 +216,7 @@ export const THEME_PRESETS: Record<ThemePreset, { name: string; description: str
       neonGreen: "#4ade80",
     },
   },
-  "sunset": {
+  sunset: {
     name: "Sunset",
     description: "Warm orange and pink tones",
     colors: {
@@ -226,7 +237,7 @@ export const THEME_PRESETS: Record<ThemePreset, { name: string; description: str
       neonGreen: "#a3e635",
     },
   },
-  "monochrome": {
+  monochrome: {
     name: "Monochrome",
     description: "Clean grayscale aesthetic",
     colors: {

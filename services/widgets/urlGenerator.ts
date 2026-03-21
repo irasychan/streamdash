@@ -17,7 +17,7 @@ import type {
  */
 export function generateChatWidgetUrl(
   config: ChatWidgetConfig,
-  defaults: typeof DEFAULT_CHAT_WIDGET_CONFIG
+  defaults: typeof DEFAULT_CHAT_WIDGET_CONFIG,
 ): string {
   const params = new URLSearchParams();
 
@@ -87,7 +87,7 @@ export function generateChatWidgetUrl(
  */
 export function generateGoalWidgetUrl(
   config: GoalWidgetConfig,
-  defaults: typeof DEFAULT_GOAL_WIDGET_CONFIG
+  defaults: typeof DEFAULT_GOAL_WIDGET_CONFIG,
 ): string {
   const params = new URLSearchParams();
 
@@ -124,7 +124,7 @@ export function generateGoalWidgetUrl(
  */
 export function generateStatsWidgetUrl(
   config: StatsWidgetConfig,
-  defaults: typeof DEFAULT_STATS_WIDGET_CONFIG
+  defaults: typeof DEFAULT_STATS_WIDGET_CONFIG,
 ): string {
   const params = new URLSearchParams();
 

@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       {
         headers,
         next: { revalidate: 60 },
-      }
+      },
     );
 
     const userPayload = await userResponse.json();
@@ -54,13 +54,10 @@ export async function GET(request: Request) {
       ? `user_id=${encodeURIComponent(user.id)}`
       : `user_login=${encodeURIComponent(channel)}`;
 
-    const streamResponse = await fetch(
-      `https://api.twitch.tv/helix/streams?${streamQuery}`,
-      {
-        headers,
-        next: { revalidate: 15 },
-      }
-    );
+    const streamResponse = await fetch(`https://api.twitch.tv/helix/streams?${streamQuery}`, {
+      headers,
+      next: { revalidate: 15 },
+    });
 
     const streamPayload = await streamResponse.json();
     const stream = streamPayload.data?.[0];
@@ -74,7 +71,7 @@ export async function GET(request: Request) {
     if (authToken.accessToken && broadcasterId) {
       const followersResponse = await fetch(
         `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${encodeURIComponent(
-          broadcasterId
+          broadcasterId,
         )}&moderator_id=${encodeURIComponent(broadcasterId)}`,
         {
           headers: {
@@ -82,7 +79,7 @@ export async function GET(request: Request) {
             Authorization: `Bearer ${authToken.accessToken}`,
           },
           next: { revalidate: 120 },
-        }
+        },
       );
 
       if (followersResponse.ok) {
@@ -113,7 +110,7 @@ export async function GET(request: Request) {
     if (authToken.updatedToken) {
       const accessMaxAge = Math.max(
         0,
-        Math.round((authToken.updatedToken.expiresAt - Date.now()) / 1000)
+        Math.round((authToken.updatedToken.expiresAt - Date.now()) / 1000),
       );
       response.cookies.set("twitch_access_token", authToken.updatedToken.accessToken, {
         ...tokenCookieOptions,
@@ -138,7 +135,7 @@ export async function GET(request: Request) {
 async function refreshUserToken(
   refreshToken: string,
   clientId: string,
-  clientSecret?: string
+  clientSecret?: string,
 ): Promise<TwitchToken | null> {
   if (!clientSecret) {
     return null;
@@ -207,7 +204,7 @@ async function getAppToken(clientId: string, clientSecret?: string) {
 async function getUserToken(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
   clientId: string,
-  clientSecret?: string
+  clientSecret?: string,
 ) {
   const accessToken = cookieStore.get("twitch_access_token")?.value;
   const refreshToken = cookieStore.get("twitch_refresh_token")?.value;

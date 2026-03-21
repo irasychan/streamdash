@@ -59,13 +59,12 @@ export default function DashboardPage() {
     const loadStats = async () => {
       // Use config channel if available, fallback to demo
       const channelToFetch = config.platforms.twitch.defaultChannel || demoStats.channel;
-      const youtubeChannelToFetch = config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
-      
+      const youtubeChannelToFetch =
+        config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
+
       try {
         const twitchResponse = await fetch("/api/twitch?channel=" + channelToFetch);
-        const youtubeResponse = await fetch(
-          "/api/youtube?channelId=" + youtubeChannelToFetch
-        );
+        const youtubeResponse = await fetch("/api/youtube?channelId=" + youtubeChannelToFetch);
         const authResponse = await fetch("/api/twitch/status");
 
         const twitchData = await twitchResponse.json();
@@ -199,10 +198,7 @@ export default function DashboardPage() {
 
   // Use config goal target if set, otherwise fallback to stats
   const goalTarget = config.goals.followerTarget || stats.goal.target;
-  const goalPercent = Math.min(
-    100,
-    Math.round((stats.goal.current / goalTarget) * 100)
-  );
+  const goalPercent = Math.min(100, Math.round((stats.goal.current / goalTarget) * 100));
 
   const twitchConnection = getPlatformStatus("twitch");
   const youtubeConnection = getPlatformStatus("youtube");
@@ -215,9 +211,7 @@ export default function DashboardPage() {
         <CardContent className="pt-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="font-display text-2xl font-semibold">
-                {stats.channel}
-              </h2>
+              <h2 className="font-display text-2xl font-semibold">{stats.channel}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {status} &middot; {twitchStatus}
               </p>
@@ -225,9 +219,10 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <Badge
                 variant={stats.live ? "default" : "secondary"}
-                className={stats.live 
-                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" 
-                  : "bg-muted/50"
+                className={
+                  stats.live
+                    ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400"
+                    : "bg-muted/50"
                 }
               >
                 {stats.live ? "On Air" : "Offline"}
@@ -262,9 +257,7 @@ export default function DashboardPage() {
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Follower Goal
             </p>
-            <p className="mt-2 font-display text-2xl font-semibold">
-              {goalPercent}%
-            </p>
+            <p className="mt-2 font-display text-2xl font-semibold">{goalPercent}%</p>
             <Progress value={goalPercent} className="mt-3 h-2" />
             <p className="mt-2 text-xs text-muted-foreground">
               {stats.goal.current.toLocaleString()} / {goalTarget.toLocaleString()}
@@ -479,12 +472,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={testAppToken}
-              disabled={appTokenBusy}
-            >
+            <Button variant="outline" size="sm" onClick={testAppToken} disabled={appTokenBusy}>
               {appTokenBusy ? "Testing..." : "Test App Token"}
             </Button>
             <span className="flex items-center text-sm text-muted-foreground">

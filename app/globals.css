@@ -34,7 +34,7 @@
   --bg-accent: #1f2335;
   --text-main: #c0caf5;
   --text-muted: #7982a9;
-  
+
   /* Neon accents */
   --neon-pink: #f7768e;
   --neon-cyan: #7dcfff;
@@ -42,13 +42,13 @@
   --neon-gold: #e0af68;
   --neon-green: #9ece6a;
   --neon-orange: #ff9e64;
-  
+
   /* Glow effects */
   --glow-pink: 0 0 20px rgba(247, 118, 142, 0.4), 0 0 40px rgba(247, 118, 142, 0.2);
   --glow-cyan: 0 0 20px rgba(125, 207, 255, 0.4), 0 0 40px rgba(125, 207, 255, 0.2);
   --glow-violet: 0 0 20px rgba(187, 154, 247, 0.4), 0 0 40px rgba(187, 154, 247, 0.2);
   --glow-green: 0 0 20px rgba(158, 206, 106, 0.4), 0 0 40px rgba(158, 206, 106, 0.2);
-  
+
   /* Shadows */
   --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(125, 207, 255, 0.08);
@@ -94,7 +94,10 @@ body.widget-transparent::before {
   background: transparent !important;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   text-wrap: balance;
   overflow-wrap: anywhere;
   letter-spacing: -0.01em;
@@ -137,7 +140,8 @@ main {
 
 /* Page styles for landing page */
 .page {
-  background: linear-gradient(160deg, rgba(18, 20, 28, 0.98), rgba(8, 10, 15, 1)),
+  background:
+    linear-gradient(160deg, rgba(18, 20, 28, 0.98), rgba(8, 10, 15, 1)),
     radial-gradient(circle at 15% 20%, rgba(247, 118, 142, 0.12), transparent 40%),
     radial-gradient(circle at 85% 10%, rgba(125, 207, 255, 0.08), transparent 35%),
     radial-gradient(circle at 55% 70%, rgba(187, 154, 247, 0.1), transparent 45%);
@@ -264,7 +268,9 @@ main {
   backdrop-filter: blur(8px);
   min-width: 0;
   overflow-wrap: anywhere;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .card:hover {
@@ -370,8 +376,12 @@ main {
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Utility classes */
@@ -415,13 +425,22 @@ main {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Stat value */
@@ -496,17 +515,17 @@ main {
     color: var(--neon-pink);
     text-shadow: 0 0 10px rgba(247, 118, 142, 0.5);
   }
-  
+
   .text-neon-cyan {
     color: var(--neon-cyan);
     text-shadow: 0 0 10px rgba(125, 207, 255, 0.5);
   }
-  
+
   .text-neon-violet {
     color: var(--neon-violet);
     text-shadow: 0 0 10px rgba(187, 154, 247, 0.5);
   }
-  
+
   /* Gradient text */
   .text-gradient {
     background: linear-gradient(135deg, var(--neon-pink), var(--neon-violet), var(--neon-cyan));
@@ -514,22 +533,27 @@ main {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   /* Glow border on hover */
   .hover-glow {
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
   }
-  
+
   .hover-glow:hover {
     border-color: rgba(125, 207, 255, 0.3);
     box-shadow: 0 0 20px rgba(125, 207, 255, 0.15);
   }
-  
+
   /* Card hover lift */
   .card-interactive {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
   }
-  
+
   .card-interactive:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-elevated);
@@ -656,5 +680,9 @@ main {
     linear-gradient(45deg, transparent 75%, #12141c 75%),
     linear-gradient(-45deg, transparent 75%, #12141c 75%);
   background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0px;
 }

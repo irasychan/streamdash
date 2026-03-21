@@ -115,10 +115,7 @@ export class DiscordBridge {
     return this.channelId;
   }
 
-  private handlePayload(
-    payload: DiscordGatewayPayload,
-    onReady?: () => void
-  ): void {
+  private handlePayload(payload: DiscordGatewayPayload, onReady?: () => void): void {
     // Update sequence number
     if (payload.s !== undefined) {
       this.sequence = payload.s;
@@ -146,7 +143,7 @@ export class DiscordBridge {
       op: 2,
       d: {
         token: this.botToken,
-        intents: 1 << 9 | 1 << 15, // GUILD_MESSAGES | MESSAGE_CONTENT
+        intents: (1 << 9) | (1 << 15), // GUILD_MESSAGES | MESSAGE_CONTENT
         properties: {
           os: "linux",
           browser: "streaming-dashboard",
@@ -156,20 +153,13 @@ export class DiscordBridge {
     });
   }
 
-  private handleDispatch(
-    eventName: string,
-    data: unknown,
-    onReady?: () => void
-  ): void {
+  private handleDispatch(eventName: string, data: unknown, onReady?: () => void): void {
     switch (eventName) {
       case "READY": {
         const ready = data as DiscordReadyEvent;
         this.sessionId = ready.session_id;
         this.connected = true;
-        console.log(
-          "[DiscordBridge] Connected as:",
-          ready.user.username
-        );
+        console.log("[DiscordBridge] Connected as:", ready.user.username);
         onReady?.();
         break;
       }

@@ -68,7 +68,11 @@ export type ChatFlushDebugEvent = {
   type: "flush-debug";
 };
 
-export type SSEEvent = ChatMessage | ChatHideEvent | ChatFlushDebugEvent | { type: "keepalive"; clientId: string };
+export type SSEEvent =
+  | ChatMessage
+  | ChatHideEvent
+  | ChatFlushDebugEvent
+  | { type: "keepalive"; clientId: string };
 
 export type SSEClient = {
   id: string;

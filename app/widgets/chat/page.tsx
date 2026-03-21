@@ -7,8 +7,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChatMessage } from "@/features/chat/components/ChatMessage";
 import { demoChatMessages } from "@/lib/demoData";
 import { useEmotes } from "@/features/emotes/hooks/useEmotes";
-import type { ChatMessage as ChatMessageType, ChatPlatform, ChatHideEvent } from "@/features/chat/types/chat";
-import type { ChatDisplayPreferences, FontSize, MessageDensity, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
+import type {
+  ChatMessage as ChatMessageType,
+  ChatPlatform,
+  ChatHideEvent,
+} from "@/features/chat/types/chat";
+import type {
+  ChatDisplayPreferences,
+  FontSize,
+  MessageDensity,
+  MessageLayout,
+  TextAlign,
+  MessageAnimation,
+} from "@/features/preferences/types";
 
 function ChatWidgetContent() {
   const [messages, setMessages] = useState<ChatMessageType[]>(demoChatMessages);
@@ -20,22 +31,16 @@ function ChatWidgetContent() {
   const { loadEmotes } = useEmotes();
 
   // Widget configuration from URL params
-  const maxMessages = useMemo(
-    () => Number(searchParams.get("maxMessages")) || 50,
-    [searchParams]
-  );
+  const maxMessages = useMemo(() => Number(searchParams.get("maxMessages")) || 50, [searchParams]);
   const platforms = useMemo(() => {
     const p = searchParams.get("platforms");
     return p ? (p.split(",") as ChatPlatform[]) : ["twitch", "youtube", "discord"];
   }, [searchParams]);
   const showPlatformBadge = useMemo(
     () => searchParams.get("showPlatform") !== "false",
-    [searchParams]
+    [searchParams],
   );
-  const transparent = useMemo(
-    () => searchParams.get("transparent") === "true",
-    [searchParams]
-  );
+  const transparent = useMemo(() => searchParams.get("transparent") === "true", [searchParams]);
 
   // Chat display preferences from URL params
   const chatPrefs = useMemo<Partial<ChatDisplayPreferences>>(() => {
@@ -77,7 +82,16 @@ function ChatWidgetContent() {
   // Animation from URL params
   const animation = useMemo<MessageAnimation>(() => {
     const anim = searchParams.get("animation");
-    const validAnimations = ["none", "fade", "slide-left", "slide-right", "slide-up", "slide-down", "scale", "bounce"];
+    const validAnimations = [
+      "none",
+      "fade",
+      "slide-left",
+      "slide-right",
+      "slide-up",
+      "slide-down",
+      "scale",
+      "bounce",
+    ];
     if (anim && validAnimations.includes(anim)) {
       return anim as MessageAnimation;
     }
@@ -85,19 +99,22 @@ function ChatWidgetContent() {
   }, [searchParams]);
 
   // Load emotes for Twitch channel
-  const loadChannelEmotes = useCallback(async (channel: string) => {
-    try {
-      const response = await fetch(`/api/twitch/user?username=${encodeURIComponent(channel)}`);
-      const data = await response.json();
-      
-      if (data.ok && data.data?.id) {
-        console.log(`[ChatWidget] Loading emotes for channel ${channel} (ID: ${data.data.id})`);
-        await loadEmotes(data.data.id);
+  const loadChannelEmotes = useCallback(
+    async (channel: string) => {
+      try {
+        const response = await fetch(`/api/twitch/user?username=${encodeURIComponent(channel)}`);
+        const data = await response.json();
+
+        if (data.ok && data.data?.id) {
+          console.log(`[ChatWidget] Loading emotes for channel ${channel} (ID: ${data.data.id})`);
+          await loadEmotes(data.data.id);
+        }
+      } catch (error) {
+        console.error("[ChatWidget] Failed to load channel emotes:", error);
       }
-    } catch (error) {
-      console.error("[ChatWidget] Failed to load channel emotes:", error);
-    }
-  }, [loadEmotes]);
+    },
+    [loadEmotes],
+  );
 
   // Auto-connect to platforms based on URL params
   useEffect(() => {
@@ -114,7 +131,7 @@ function ChatWidgetContent() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ platform: "twitch", channel: twitchChannel }),
-          })
+          }),
         );
         // Load emotes for the channel
         loadChannelEmotes(twitchChannel);
@@ -127,7 +144,7 @@ function ChatWidgetContent() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ platform: "youtube", videoId: youtubeVideoId }),
-          })
+          }),
         );
       }
 
@@ -137,7 +154,7 @@ function ChatWidgetContent() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ platform: "discord", channelId: discordChannelId }),
-          })
+          }),
         );
       }
 
@@ -231,7 +248,7 @@ function ChatWidgetContent() {
   // Filter out hidden messages for display
   const visibleMessages = useMemo(
     () => messages.filter((msg) => !hiddenMessageIds.has(msg.id)),
-    [messages, hiddenMessageIds]
+    [messages, hiddenMessageIds],
   );
 
   return (
@@ -246,7 +263,7 @@ function ChatWidgetContent() {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="h-[calc(100vh-2rem)] overflow-y-auto p-3 space-y-0.5 [&::-webkit-scrollbar]:hidden"
+          className="h-[calc(100vh-2rem)] space-y-0.5 overflow-y-auto p-3 [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: "none" }}
         >
           {visibleMessages.map((msg) => (
@@ -267,7 +284,7 @@ function ChatWidgetContent() {
 function ChatWidgetSkeleton() {
   return (
     <Card className="border-primary/25 bg-background/75">
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="space-y-3 p-4">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex items-start gap-2">
             <Skeleton className="h-4 w-4 rounded" />
@@ -287,7 +304,7 @@ function ChatWidgetWrapper() {
   const transparent = searchParams.get("transparent") === "true";
 
   return (
-    <main className={transparent ? "min-h-screen" : "p-4 min-h-screen"}>
+    <main className={transparent ? "min-h-screen" : "min-h-screen p-4"}>
       <ChatWidgetContent />
     </main>
   );

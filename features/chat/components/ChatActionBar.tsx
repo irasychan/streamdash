@@ -29,17 +29,16 @@ export function ChatActionBar({
   const isTwitch = selectedMessage.platform === "twitch";
 
   return (
-    <div className="sticky bottom-0 z-10 border-t border-border/40 bg-background/80 backdrop-blur-sm px-3 py-2 space-y-1.5">
+    <div className="sticky bottom-0 z-10 space-y-1.5 border-t border-border/40 bg-background/80 px-3 py-2 backdrop-blur-sm">
       {/* Row 1: context + hide/unhide + close */}
       <div className="flex items-center gap-2">
         {/* User info */}
-        <div className="flex items-center gap-2 mr-auto min-w-0">
+        <div className="mr-auto flex min-w-0 items-center gap-2">
           <PlatformBadge platform={selectedMessage.platform} />
           <span
-            className="text-sm font-semibold truncate"
+            className="truncate text-sm font-semibold"
             style={{
-              color:
-                selectedMessage.author.color || "hsl(var(--foreground))",
+              color: selectedMessage.author.color || "hsl(var(--foreground))",
             }}
           >
             {selectedMessage.author.displayName}
@@ -71,7 +70,7 @@ export function ChatActionBar({
         <button
           type="button"
           onClick={onDeselect}
-          className="rounded p-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-white/5"
+          className="rounded p-1 text-muted-foreground/60 hover:bg-white/5 hover:text-muted-foreground"
           title="Deselect (Esc)"
           aria-label="Deselect message"
         >
@@ -98,11 +97,11 @@ export function ChatActionBar({
               variant="ghost"
               size="sm"
               onClick={onBan}
-              className="h-7 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-400/10"
+              className="h-7 text-xs text-rose-400 hover:bg-rose-400/10 hover:text-rose-300"
             >
               Ban
             </Button>
-            <span className="hidden sm:inline-flex ml-auto text-[10px] text-muted-foreground/50 whitespace-nowrap">
+            <span className="ml-auto hidden whitespace-nowrap text-[10px] text-muted-foreground/50 sm:inline-flex">
               <kbd className="font-mono">H</kbd>&nbsp;hide&nbsp;&middot;&nbsp;
               <kbd className="font-mono">T</kbd>&nbsp;timeout&nbsp;&middot;&nbsp;
               <kbd className="font-mono">B</kbd>&nbsp;ban&nbsp;&middot;&nbsp;
@@ -114,14 +113,14 @@ export function ChatActionBar({
         {isTwitch && !isTwitchAuthed && (
           <a
             href="/api/twitch/auth"
-            className="text-[11px] text-muted-foreground/60 hover:text-primary/80 transition-colors whitespace-nowrap"
+            className="whitespace-nowrap text-[11px] text-muted-foreground/60 transition-colors hover:text-primary/80"
           >
             Connect Twitch to unlock moderation →
           </a>
         )}
 
         {!isTwitch && (
-          <span className="text-[11px] text-muted-foreground/40 whitespace-nowrap">
+          <span className="whitespace-nowrap text-[11px] text-muted-foreground/40">
             Moderation available for Twitch only
           </span>
         )}

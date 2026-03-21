@@ -6,13 +6,21 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, MessageSquare, Eye, Save, Loader2 } from "lucide-react";
 import { useConfig } from "@/features/config/useConfig";
 import { WidgetConfigCard, ChatWidgetConfigForm } from "@/features/widgets/components";
-import { generateChatWidgetUrl, generateGoalWidgetUrl, generateStatsWidgetUrl } from "@/services/widgets/urlGenerator";
+import {
+  generateChatWidgetUrl,
+  generateGoalWidgetUrl,
+  generateStatsWidgetUrl,
+} from "@/services/widgets/urlGenerator";
 import {
   DEFAULT_CHAT_WIDGET_CONFIG,
   DEFAULT_GOAL_WIDGET_CONFIG,
   DEFAULT_STATS_WIDGET_CONFIG,
 } from "@/features/config/types";
-import type { ChatWidgetConfig, GoalWidgetConfig, StatsWidgetConfig } from "@/features/config/types";
+import type {
+  ChatWidgetConfig,
+  GoalWidgetConfig,
+  StatsWidgetConfig,
+} from "@/features/config/types";
 
 export default function WidgetsPage() {
   const { config, loading, saving, update } = useConfig();
@@ -20,33 +28,33 @@ export default function WidgetsPage() {
   // Merge server config with defaults for widgets
   const chatConfig = useMemo(
     () => ({ ...DEFAULT_CHAT_WIDGET_CONFIG, ...config.widgets?.chat }),
-    [config.widgets?.chat]
+    [config.widgets?.chat],
   );
 
   const goalConfig = useMemo(
     () => ({ ...DEFAULT_GOAL_WIDGET_CONFIG, ...config.widgets?.goal }),
-    [config.widgets?.goal]
+    [config.widgets?.goal],
   );
 
   const statsConfig = useMemo(
     () => ({ ...DEFAULT_STATS_WIDGET_CONFIG, ...config.widgets?.stats }),
-    [config.widgets?.stats]
+    [config.widgets?.stats],
   );
 
   // Generate URLs from config
   const chatUrl = useMemo(
     () => generateChatWidgetUrl(chatConfig, DEFAULT_CHAT_WIDGET_CONFIG),
-    [chatConfig]
+    [chatConfig],
   );
 
   const goalUrl = useMemo(
     () => generateGoalWidgetUrl(goalConfig, DEFAULT_GOAL_WIDGET_CONFIG),
-    [goalConfig]
+    [goalConfig],
   );
 
   const statsUrl = useMemo(
     () => generateStatsWidgetUrl(statsConfig, DEFAULT_STATS_WIDGET_CONFIG),
-    [statsConfig]
+    [statsConfig],
   );
 
   // Update handlers
@@ -58,7 +66,7 @@ export default function WidgetsPage() {
         },
       });
     },
-    [update, chatConfig]
+    [update, chatConfig],
   );
 
   const handleGoalConfigChange = useCallback(
@@ -69,7 +77,7 @@ export default function WidgetsPage() {
         },
       });
     },
-    [update, goalConfig]
+    [update, goalConfig],
   );
 
   const handleStatsConfigChange = useCallback(
@@ -80,7 +88,7 @@ export default function WidgetsPage() {
         },
       });
     },
-    [update, statsConfig]
+    [update, statsConfig],
   );
 
   return (
@@ -157,10 +165,17 @@ export default function WidgetsPage() {
         </CardHeader>
         <CardContent className="prose prose-sm prose-invert max-w-none">
           <ol className="space-y-2 text-muted-foreground">
-            <li>Click <strong>Configure</strong> on any widget to customize its settings</li>
+            <li>
+              Click <strong>Configure</strong> on any widget to customize its settings
+            </li>
             <li>Settings are saved automatically as you make changes</li>
-            <li>Copy the generated URL and add it as a <strong>Browser Source</strong> in OBS</li>
-            <li>Recommended dimensions: <code>400x600</code> for chat, <code>400x200</code> for stats/goal</li>
+            <li>
+              Copy the generated URL and add it as a <strong>Browser Source</strong> in OBS
+            </li>
+            <li>
+              Recommended dimensions: <code>400x600</code> for chat, <code>400x200</code> for
+              stats/goal
+            </li>
           </ol>
         </CardContent>
       </Card>
@@ -240,9 +255,7 @@ function GoalWidgetConfigForm({
         <div className="flex items-center justify-between">
           <div>
             <Label htmlFor="show-numbers">Show Numbers</Label>
-            <p className="text-xs text-muted-foreground">
-              Display current/target count
-            </p>
+            <p className="text-xs text-muted-foreground">Display current/target count</p>
           </div>
           <Switch
             id="show-numbers"

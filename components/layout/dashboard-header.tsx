@@ -23,13 +23,13 @@ export function DashboardHeader() {
   const { status, isLive } = useDashboardStatus();
   const { status: connectionStatus } = useChatStatus();
 
-  const connectedPlatforms = connectionStatus.filter(s => s.connected);
+  const connectedPlatforms = connectionStatus.filter((s) => s.connected);
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/40 bg-background/80 px-4 backdrop-blur-md">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
-      
+
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-lg font-medium">{title}</h1>
@@ -38,25 +38,25 @@ export function DashboardHeader() {
         <div className="flex items-center gap-4">
           {/* Platform Connection Status */}
           {connectionStatus.length > 0 && (
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="hidden items-center gap-2 sm:flex">
               {connectionStatus.map((s) => (
                 <div
                   key={s.platform}
                   className={cn(
                     "flex items-center gap-1.5 rounded-md px-2 py-1 text-xs transition-all",
-                    s.connected 
-                      ? "bg-emerald-500/10" 
-                      : "bg-muted/20 opacity-50"
+                    s.connected ? "bg-emerald-500/10" : "bg-muted/20 opacity-50",
                   )}
-                  title={s.connected ? `${s.platform}: ${s.channel}` : `${s.platform}: Disconnected`}
+                  title={
+                    s.connected ? `${s.platform}: ${s.channel}` : `${s.platform}: Disconnected`
+                  }
                 >
                   <PlatformBadge platform={s.platform} size="sm" />
                   <span
                     className={cn(
                       "h-1.5 w-1.5 rounded-full",
-                      s.connected 
-                        ? "bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.6)]" 
-                        : "bg-muted-foreground/30"
+                      s.connected
+                        ? "bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.6)]"
+                        : "bg-muted-foreground/30",
                     )}
                   />
                 </div>
@@ -64,25 +64,25 @@ export function DashboardHeader() {
             </div>
           )}
 
-          <Separator orientation="vertical" className="h-4 hidden sm:block" />
+          <Separator orientation="vertical" className="hidden h-4 sm:block" />
 
           {/* Status Text */}
-          <span className="text-xs text-muted-foreground hidden md:block">{status}</span>
-          
+          <span className="hidden text-xs text-muted-foreground md:block">{status}</span>
+
           {/* Live Badge */}
           <Badge
             variant={isLive ? "default" : "secondary"}
             className={cn(
               "text-xs font-medium",
-              isLive 
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
-                : "bg-muted/50 text-muted-foreground"
+              isLive
+                ? "border border-emerald-500/30 bg-emerald-500/20 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                : "bg-muted/50 text-muted-foreground",
             )}
           >
             <span
               className={cn(
                 "mr-1.5 h-1.5 w-1.5 rounded-full",
-                isLive ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground/50"
+                isLive ? "animate-pulse bg-emerald-400" : "bg-muted-foreground/50",
               )}
             />
             {isLive ? "Live" : "Offline"}

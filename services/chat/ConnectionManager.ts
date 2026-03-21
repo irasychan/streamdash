@@ -7,10 +7,7 @@ import type {
   SSEClient,
 } from "@/features/chat/types/chat";
 import { TwitchIRC } from "./bridges/TwitchIRC";
-import {
-  YouTubeMasterchat,
-  type YouTubeMasterchatError,
-} from "./bridges/YouTubeMasterchat";
+import { YouTubeMasterchat, type YouTubeMasterchatError } from "./bridges/YouTubeMasterchat";
 import { DiscordBridge } from "./bridges/DiscordBridge";
 
 const MESSAGE_BUFFER_SIZE = 100;
@@ -76,10 +73,7 @@ class ConnectionManager {
         client.send(message);
       } catch (error) {
         // Client disconnected, will be cleaned up
-        console.error(
-          `Error sending SSE message to client ${clientId}:`,
-          error
-        );
+        console.error(`Error sending SSE message to client ${clientId}:`, error);
       }
     }
   }
@@ -121,10 +115,7 @@ class ConnectionManager {
       try {
         client.send(event);
       } catch (error) {
-        console.error(
-          `Error sending SSE control event to client ${clientId}:`,
-          error
-        );
+        console.error(`Error sending SSE control event to client ${clientId}:`, error);
       }
     }
   }
@@ -146,7 +137,7 @@ class ConnectionManager {
   public async connectTwitch(
     channel: string,
     accessToken?: string,
-    username?: string
+    username?: string,
   ): Promise<void> {
     if (this.twitchIRC) {
       this.twitchIRC.disconnect();

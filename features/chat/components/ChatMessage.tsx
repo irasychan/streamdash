@@ -3,7 +3,12 @@
 import type { MouseEvent } from "react";
 import Image from "next/image";
 import type { ChatMessage as ChatMessageType, ChatModerationAction } from "../types/chat";
-import type { ChatDisplayPreferences, MessageLayout, TextAlign, MessageAnimation } from "@/features/preferences/types";
+import type {
+  ChatDisplayPreferences,
+  MessageLayout,
+  TextAlign,
+  MessageAnimation,
+} from "@/features/preferences/types";
 import { PlatformBadge } from "./PlatformBadge";
 import { cn } from "@/lib/ui/cn";
 import { renderMessageWithEmotes } from "../utils/emoteRenderer";
@@ -139,50 +144,51 @@ export function ChatMessage({
     onUnhide?.(message);
   };
 
-  const actionButtons = (showModerationControls || showHideControls) ? (
-    <div className="pointer-events-auto absolute right-2 top-1 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-      {showHideControls && !isHidden && (
-        <button
-          type="button"
-          onClick={handleHide}
-          className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300 ring-1 ring-slate-400/30 bg-slate-400/10 hover:bg-slate-400/20"
-          title="Hide from OBS widget"
-        >
-          Hide
-        </button>
-      )}
-      {showHideControls && isHidden && (
-        <button
-          type="button"
-          onClick={handleUnhide}
-          className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-400/30 bg-emerald-400/10 hover:bg-emerald-400/20"
-          title="Show in OBS widget again"
-        >
-          Unhide
-        </button>
-      )}
-      {showModerationControls && (
-        <>
+  const actionButtons =
+    showModerationControls || showHideControls ? (
+      <div className="pointer-events-auto absolute right-2 top-1 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        {showHideControls && !isHidden && (
           <button
             type="button"
-            onClick={handleModerate("timeout")}
-            className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300 ring-1 ring-amber-400/30 bg-amber-400/10 hover:bg-amber-400/20"
-            title="Timeout user"
+            onClick={handleHide}
+            className="rounded bg-slate-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300 ring-1 ring-slate-400/30 hover:bg-slate-400/20"
+            title="Hide from OBS widget"
           >
-            Timeout
+            Hide
           </button>
+        )}
+        {showHideControls && isHidden && (
           <button
             type="button"
-            onClick={handleModerate("ban")}
-            className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-300 ring-1 ring-rose-400/30 bg-rose-400/10 hover:bg-rose-400/20"
-            title="Ban user"
+            onClick={handleUnhide}
+            className="rounded bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-400/30 hover:bg-emerald-400/20"
+            title="Show in OBS widget again"
           >
-            Ban
+            Unhide
           </button>
-        </>
-      )}
-    </div>
-  ) : null;
+        )}
+        {showModerationControls && (
+          <>
+            <button
+              type="button"
+              onClick={handleModerate("timeout")}
+              className="rounded bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300 ring-1 ring-amber-400/30 hover:bg-amber-400/20"
+              title="Timeout user"
+            >
+              Timeout
+            </button>
+            <button
+              type="button"
+              onClick={handleModerate("ban")}
+              className="rounded bg-rose-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-400/20"
+              title="Ban user"
+            >
+              Ban
+            </button>
+          </>
+        )}
+      </div>
+    ) : null;
 
   const isStacked = messageLayout === "stacked";
   const isInlineWrap = messageLayout === "inline-wrap";
@@ -200,16 +206,16 @@ export function ChatMessage({
           "hover:bg-white/[0.03]",
           highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
           isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
-          isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
-          isModerated && !isHidden && "opacity-40 bg-rose-500/5 ring-1 ring-rose-500/20",
-          isSelected && "ring-2 ring-primary/60 bg-primary/10",
+          isHidden && "bg-slate-500/5 opacity-40 ring-1 ring-slate-500/20",
+          isModerated && !isHidden && "bg-rose-500/5 opacity-40 ring-1 ring-rose-500/20",
+          isSelected && "bg-primary/10 ring-2 ring-primary/60",
           onSelect && "cursor-pointer",
           fontSizeClasses[fontSize],
           densityClasses[density],
           textAlignClasses[textAlign],
           animationClasses[animation],
           hasActionButtons && "pr-24",
-          className
+          className,
         )}
         style={fontFamily ? { fontFamily } : undefined}
         onClick={handleClick}
@@ -217,7 +223,7 @@ export function ChatMessage({
         {actionButtons}
         <span className="inline">
           {showPlatform && (
-            <span className="inline-flex align-middle mr-1.5">
+            <span className="mr-1.5 inline-flex align-middle">
               <PlatformBadge platform={platform} className="shrink-0" />
             </span>
           )}
@@ -229,8 +235,8 @@ export function ChatMessage({
               width={avatarSizePx[fontSize]}
               height={avatarSizePx[fontSize]}
               className={cn(
-                "rounded-full inline-block align-middle mr-1.5 ring-1 ring-white/10",
-                avatarSizeClasses[fontSize]
+                "mr-1.5 inline-block rounded-full align-middle ring-1 ring-white/10",
+                avatarSizeClasses[fontSize],
               )}
               unoptimized
             />
@@ -244,32 +250,31 @@ export function ChatMessage({
           </span>
 
           {showBadges && isModerator && (
-            <span 
-              className="inline-flex items-center align-middle ml-1 rounded px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30"
+            <span
+              className="ml-1 inline-flex items-center rounded bg-emerald-500/20 px-1 py-0.5 align-middle text-[9px] font-bold uppercase tracking-wide text-emerald-400 ring-1 ring-emerald-500/30"
               title="Moderator"
             >
               MOD
             </span>
           )}
           {showBadges && isSubscriber && (
-            <span 
-              className="inline-flex items-center align-middle ml-1 rounded px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-primary/20 text-primary ring-1 ring-primary/30"
+            <span
+              className="ml-1 inline-flex items-center rounded bg-primary/20 px-1 py-0.5 align-middle text-[9px] font-bold uppercase tracking-wide text-primary ring-1 ring-primary/30"
               title="Subscriber"
             >
               SUB
             </span>
           )}
 
-          <span className="text-muted-foreground/60 mx-1">:</span>
+          <span className="mx-1 text-muted-foreground/60">:</span>
 
-          <span className="break-words text-foreground/90 leading-relaxed">
-            {renderMessageWithEmotes(
-              content,
-              emotes,
-              fontSize,
-              thirdPartyEmotes,
-              { showTwitchEmotes, showThirdPartyEmotes, highlightMentions, highlightKeywords }
-            )}
+          <span className="break-words leading-relaxed text-foreground/90">
+            {renderMessageWithEmotes(content, emotes, fontSize, thirdPartyEmotes, {
+              showTwitchEmotes,
+              showThirdPartyEmotes,
+              highlightMentions,
+              highlightKeywords,
+            })}
           </span>
         </span>
       </div>
@@ -284,8 +289,8 @@ export function ChatMessage({
         "hover:bg-white/[0.03]",
         highlighted && !isHidden && "bg-primary/15 ring-1 ring-primary/30",
         isModerator && !isHidden && "bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]",
-        isHidden && "opacity-40 bg-slate-500/5 ring-1 ring-slate-500/20",
-        isSelected && "ring-2 ring-primary/60 bg-primary/10",
+        isHidden && "bg-slate-500/5 opacity-40 ring-1 ring-slate-500/20",
+        isSelected && "bg-primary/10 ring-2 ring-primary/60",
         onSelect && "cursor-pointer",
         fontSizeClasses[fontSize],
         densityClasses[density],
@@ -293,19 +298,14 @@ export function ChatMessage({
         textAlignClasses[textAlign],
         animationClasses[animation],
         hasActionButtons && "pr-24",
-        className
+        className,
       )}
       style={fontFamily ? { fontFamily } : undefined}
       onClick={handleClick}
     >
       {actionButtons}
       {/* Header row: platform badge, avatar, username, badges */}
-      <div
-        className={cn(
-          "flex items-center gap-2",
-          isStacked && flexAlignClasses[textAlign]
-        )}
-      >
+      <div className={cn("flex items-center gap-2", isStacked && flexAlignClasses[textAlign])}>
         {showPlatform && <PlatformBadge platform={platform} className="shrink-0" />}
 
         {showAvatars && author.avatar && (
@@ -315,8 +315,8 @@ export function ChatMessage({
             width={avatarSizePx[fontSize]}
             height={avatarSizePx[fontSize]}
             className={cn(
-              "rounded-full shrink-0 ring-1 ring-white/10",
-              avatarSizeClasses[fontSize]
+              "shrink-0 rounded-full ring-1 ring-white/10",
+              avatarSizeClasses[fontSize],
             )}
             unoptimized
           />
@@ -330,16 +330,16 @@ export function ChatMessage({
             {author.displayName}
           </span>
           {showBadges && isModerator && (
-            <span 
-              className="inline-flex items-center rounded px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30"
+            <span
+              className="inline-flex items-center rounded bg-emerald-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-400 ring-1 ring-emerald-500/30"
               title="Moderator"
             >
               MOD
             </span>
           )}
           {showBadges && isSubscriber && (
-            <span 
-              className="inline-flex items-center rounded px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-primary/20 text-primary ring-1 ring-primary/30"
+            <span
+              className="inline-flex items-center rounded bg-primary/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary ring-1 ring-primary/30"
               title="Subscriber"
             >
               SUB
@@ -353,14 +353,13 @@ export function ChatMessage({
 
       {/* Message content */}
       <div className={cn("min-w-0", !isStacked && "flex-1")}>
-        <span className="break-words text-foreground/90 leading-relaxed">
-          {renderMessageWithEmotes(
-            content,
-            emotes,
-            fontSize,
-            thirdPartyEmotes,
-            { showTwitchEmotes, showThirdPartyEmotes, highlightMentions, highlightKeywords }
-          )}
+        <span className="break-words leading-relaxed text-foreground/90">
+          {renderMessageWithEmotes(content, emotes, fontSize, thirdPartyEmotes, {
+            showTwitchEmotes,
+            showThirdPartyEmotes,
+            highlightMentions,
+            highlightKeywords,
+          })}
         </span>
       </div>
     </div>

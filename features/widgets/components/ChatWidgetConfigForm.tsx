@@ -28,11 +28,7 @@ const PLATFORMS: { id: ChatPlatform; label: string }[] = [
   { id: "discord", label: "Discord" },
 ];
 
-export function ChatWidgetConfigForm({
-  config,
-  onChange,
-  disabled,
-}: ChatWidgetConfigFormProps) {
+export function ChatWidgetConfigForm({ config, onChange, disabled }: ChatWidgetConfigFormProps) {
   const handlePlatformToggle = (platform: ChatPlatform, enabled: boolean) => {
     const newPlatforms = enabled
       ? [...config.platforms, platform]
@@ -51,9 +47,7 @@ export function ChatWidgetConfigForm({
               <Checkbox
                 id={`platform-${id}`}
                 checked={config.platforms.includes(id)}
-                onCheckedChange={(checked) =>
-                  handlePlatformToggle(id, checked === true)
-                }
+                onCheckedChange={(checked) => handlePlatformToggle(id, checked === true)}
                 disabled={disabled}
               />
               <label
@@ -139,9 +133,7 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="font-size">Font Size</Label>
             <Select
               value={config.fontSize}
-              onValueChange={(value: "small" | "medium" | "large") =>
-                onChange({ fontSize: value })
-              }
+              onValueChange={(value: "small" | "medium" | "large") => onChange({ fontSize: value })}
               disabled={disabled}
             >
               <SelectTrigger id="font-size">
@@ -181,9 +173,17 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="animation">Message Animation</Label>
             <Select
               value={config.animation}
-              onValueChange={(value: "none" | "fade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "scale" | "bounce") =>
-                onChange({ animation: value })
-              }
+              onValueChange={(
+                value:
+                  | "none"
+                  | "fade"
+                  | "slide-left"
+                  | "slide-right"
+                  | "slide-up"
+                  | "slide-down"
+                  | "scale"
+                  | "bounce",
+              ) => onChange({ animation: value })}
               disabled={disabled}
             >
               <SelectTrigger id="animation">
@@ -228,9 +228,7 @@ export function ChatWidgetConfigForm({
             <Label htmlFor="text-align">Text Alignment</Label>
             <Select
               value={config.textAlign}
-              onValueChange={(value: "left" | "center" | "right") =>
-                onChange({ textAlign: value })
-              }
+              onValueChange={(value: "left" | "center" | "right") => onChange({ textAlign: value })}
               disabled={disabled}
             >
               <SelectTrigger id="text-align">
@@ -253,9 +251,7 @@ export function ChatWidgetConfigForm({
         <div className="flex items-center justify-between">
           <div>
             <Label htmlFor="transparent">Transparent Background</Label>
-            <p className="text-xs text-muted-foreground">
-              For clean OBS overlays
-            </p>
+            <p className="text-xs text-muted-foreground">For clean OBS overlays</p>
           </div>
           <Switch
             id="transparent"
@@ -268,16 +264,12 @@ export function ChatWidgetConfigForm({
         <div className="flex items-center justify-between">
           <div>
             <Label htmlFor="show-platform">Show Platform Badge</Label>
-            <p className="text-xs text-muted-foreground">
-              Display Twitch/YouTube/Discord icon
-            </p>
+            <p className="text-xs text-muted-foreground">Display Twitch/YouTube/Discord icon</p>
           </div>
           <Switch
             id="show-platform"
             checked={config.showPlatformBadge}
-            onCheckedChange={(checked) =>
-              onChange({ showPlatformBadge: checked })
-            }
+            onCheckedChange={(checked) => onChange({ showPlatformBadge: checked })}
             disabled={disabled}
           />
         </div>
@@ -285,9 +277,7 @@ export function ChatWidgetConfigForm({
         <div className="flex items-center justify-between">
           <div>
             <Label htmlFor="show-avatars">Show Avatars</Label>
-            <p className="text-xs text-muted-foreground">
-              Display user profile pictures
-            </p>
+            <p className="text-xs text-muted-foreground">Display user profile pictures</p>
           </div>
           <Switch
             id="show-avatars"
@@ -300,9 +290,7 @@ export function ChatWidgetConfigForm({
         <div className="flex items-center justify-between">
           <div>
             <Label htmlFor="show-badges">Show Badges</Label>
-            <p className="text-xs text-muted-foreground">
-              Moderator, subscriber badges
-            </p>
+            <p className="text-xs text-muted-foreground">Moderator, subscriber badges</p>
           </div>
           <Switch
             id="show-badges"

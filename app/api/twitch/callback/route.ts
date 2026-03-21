@@ -44,10 +44,9 @@ export async function GET(request: Request) {
     redirect_uri: `${url.origin}/api/twitch/callback`,
   });
 
-  const tokenResponse = await fetch(
-    `https://id.twitch.tv/oauth2/token?${tokenParams.toString()}`,
-    { method: "POST" }
-  );
+  const tokenResponse = await fetch(`https://id.twitch.tv/oauth2/token?${tokenParams.toString()}`, {
+    method: "POST",
+  });
 
   if (!tokenResponse.ok) {
     return NextResponse.json({ ok: false, error: "Failed to exchange code" });

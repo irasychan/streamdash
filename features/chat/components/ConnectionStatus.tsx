@@ -19,9 +19,7 @@ export function ConnectionStatus({ className, showLabels = false }: ConnectionSt
           key={s.platform}
           className={cn(
             "flex items-center gap-1.5 rounded-full px-2 py-1 transition-all",
-            s.connected 
-              ? "bg-emerald-500/10 ring-1 ring-emerald-500/20" 
-              : "bg-muted/30"
+            s.connected ? "bg-emerald-500/10 ring-1 ring-emerald-500/20" : "bg-muted/30",
           )}
           title={`${s.platform}: ${s.connected ? `Connected to ${s.channel}` : "Disconnected"}`}
         >
@@ -29,13 +27,13 @@ export function ConnectionStatus({ className, showLabels = false }: ConnectionSt
           <span
             className={cn(
               "h-1.5 w-1.5 rounded-full transition-all",
-              s.connected 
-                ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]" 
-                : "bg-muted-foreground/40"
+              s.connected
+                ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]"
+                : "bg-muted-foreground/40",
             )}
           />
           {showLabels && s.connected && (
-            <span className="text-[10px] font-medium text-emerald-400 truncate max-w-[60px]">
+            <span className="max-w-[60px] truncate text-[10px] font-medium text-emerald-400">
               {s.channel}
             </span>
           )}

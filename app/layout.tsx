@@ -20,11 +20,7 @@ export const metadata: Metadata = {
   description: "A dashboard and OBS-ready widgets for streaming metrics.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${displayFont.variable}`}>

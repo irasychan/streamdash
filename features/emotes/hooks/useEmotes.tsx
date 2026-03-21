@@ -19,10 +19,7 @@ export function useEmotes(): EmoteHookResult {
   const loadEmotes = useAppStore((state) => state.loadEmotes);
   const getEmote = useAppStore((state) => state.getEmote);
 
-  const emotes = useMemo(
-    () => new Map(Object.entries(emotesByName)),
-    [emotesByName]
-  );
+  const emotes = useMemo(() => new Map(Object.entries(emotesByName)), [emotesByName]);
 
   return { emotes, isLoading, loadEmotes, getEmote };
 }

@@ -13,3 +13,4 @@ pnpm-debug.log*
 .data
 .playwright-mcp/
 *.tsbuildinfo
+highlight-test.png

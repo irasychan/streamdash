@@ -1,16 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import type {
-  UserPreferences,
-  PartialPreferences,
-  ThemePreset,
-  ThemeColors,
-} from "./types";
-import {
-  DEFAULT_PREFERENCES,
-  THEME_PRESETS,
-} from "./types";
+import type { UserPreferences, PartialPreferences, ThemePreset, ThemeColors } from "./types";
+import { DEFAULT_PREFERENCES, THEME_PRESETS } from "./types";
 
 const STORAGE_KEY = "streamdash-preferences";
 
@@ -134,7 +126,7 @@ function applyTheme(preset: ThemePreset, opacity: number): void {
   root.style.setProperty("--muted-foreground", colors.mutedForeground);
   root.style.setProperty("--accent", colors.accent);
   root.style.setProperty("--border", colors.border);
-  
+
   // Apply neon colors
   root.style.setProperty("--neon-pink", colors.neonPink);
   root.style.setProperty("--neon-cyan", colors.neonCyan);
@@ -155,7 +147,7 @@ function initializeStore() {
 
   store.preferences = loadPreferences();
   store.loading = false;
-  
+
   // Update cached snapshot (no theme application yet - that happens in useEffect)
   cachedSnapshot = {
     preferences: store.preferences,
@@ -189,10 +181,7 @@ export function usePreferences() {
       if (event.key === STORAGE_KEY && event.newValue) {
         try {
           store.preferences = mergeWithDefaults(JSON.parse(event.newValue));
-          applyTheme(
-            store.preferences.theme.preset, 
-            store.preferences.theme.backgroundOpacity
-          );
+          applyTheme(store.preferences.theme.preset, store.preferences.theme.backgroundOpacity);
           emitChange();
         } catch {
           // Ignore parse errors
@@ -210,33 +199,30 @@ export function usePreferences() {
       chat: { ...store.preferences.chat, ...partial.chat },
       theme: { ...store.preferences.theme, ...partial.theme },
     };
-    
+
     savePreferences(store.preferences);
-    
+
     // Apply theme if it changed
     if (partial.theme?.preset !== undefined || partial.theme?.backgroundOpacity !== undefined) {
-      applyTheme(
-        store.preferences.theme.preset, 
-        store.preferences.theme.backgroundOpacity
-      );
+      applyTheme(store.preferences.theme.preset, store.preferences.theme.backgroundOpacity);
     }
-    
+
     emitChange();
   }, []);
 
   const reset = useCallback(() => {
     store.preferences = DEFAULT_PREFERENCES;
     savePreferences(store.preferences);
-    applyTheme(
-      store.preferences.theme.preset, 
-      store.preferences.theme.backgroundOpacity
-    );
+    applyTheme(store.preferences.theme.preset, store.preferences.theme.backgroundOpacity);
     emitChange();
   }, []);
 
-  const setTheme = useCallback((preset: ThemePreset) => {
-    update({ theme: { preset } });
-  }, [update]);
+  const setTheme = useCallback(
+    (preset: ThemePreset) => {
+      update({ theme: { preset } });
+    },
+    [update],
+  );
 
   return {
     preferences: state.preferences,

@@ -15,10 +15,7 @@ export async function POST(request: Request) {
     const { platform } = body;
 
     if (!platform) {
-      return NextResponse.json(
-        { ok: false, error: "Platform is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Platform is required" }, { status: 400 });
     }
 
     switch (platform) {
@@ -32,10 +29,7 @@ export async function POST(request: Request) {
         connectionManager.disconnectDiscord();
         break;
       default:
-        return NextResponse.json(
-          { ok: false, error: "Invalid platform" },
-          { status: 400 }
-        );
+        return NextResponse.json({ ok: false, error: "Invalid platform" }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -49,7 +43,7 @@ export async function POST(request: Request) {
         ok: false,
         error: error instanceof Error ? error.message : "Failed to disconnect",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

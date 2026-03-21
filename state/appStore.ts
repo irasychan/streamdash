@@ -56,11 +56,15 @@ export const useAppStore = create<AppStore>()(
             set({ chatStatus: platforms });
 
             const twitchStatus = platforms.find(
-              (p: ChatConnectionStatus) => p.platform === "twitch"
+              (p: ChatConnectionStatus) => p.platform === "twitch",
             );
 
             const lastChannel = get().lastTwitchChannel;
-            if (twitchStatus?.connected && twitchStatus.channel && twitchStatus.channel !== lastChannel) {
+            if (
+              twitchStatus?.connected &&
+              twitchStatus.channel &&
+              twitchStatus.channel !== lastChannel
+            ) {
               set({ lastTwitchChannel: twitchStatus.channel });
               await get().lookupTwitchUserId(twitchStatus.channel);
             } else if (!twitchStatus?.connected && lastChannel) {
@@ -75,9 +79,7 @@ export const useAppStore = create<AppStore>()(
       },
       lookupTwitchUserId: async (channel: string) => {
         try {
-          const response = await fetch(
-            `/api/twitch/user?username=${encodeURIComponent(channel)}`
-          );
+          const response = await fetch(`/api/twitch/user?username=${encodeURIComponent(channel)}`);
           const data = await response.json();
           if (data.ok && data.data?.id) {
             set({ twitchUserId: data.data.id });
@@ -125,7 +127,7 @@ export const useAppStore = create<AppStore>()(
 
           set({ emotesByName: nextEmotes, emoteChannelId: twitchUserId });
           console.log(
-            `[Emotes] Loaded ${Object.keys(nextEmotes).length} third-party emotes for channel ${twitchUserId}`
+            `[Emotes] Loaded ${Object.keys(nextEmotes).length} third-party emotes for channel ${twitchUserId}`,
           );
         } catch (error) {
           console.error("[Emotes] Failed to load emotes:", error);
@@ -143,6 +145,6 @@ export const useAppStore = create<AppStore>()(
         emotesByName: state.emotesByName,
         emoteChannelId: state.emoteChannelId,
       }),
-    }
-  )
+    },
+  ),
 );

@@ -1,13 +1,9 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, Copy, Check, Settings2, PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/ui/cn";
 import { WidgetPreview } from "./WidgetPreview";
@@ -38,13 +34,12 @@ export function WidgetConfigCard({
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
-  const [origin, setOrigin] = useState("");
 
-  // Get origin on client side
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
-
+  const origin = useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => "",
+  );
   const fullUrl = origin + previewUrl;
 
   const handleCopy = () => {
@@ -75,7 +70,7 @@ export function WidgetConfigCard({
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 transition-transform duration-200",
-                    isOpen && "rotate-180"
+                    isOpen && "rotate-180",
                   )}
                 />
               </Button>
@@ -91,7 +86,7 @@ export function WidgetConfigCard({
               <div
                 className={cn(
                   "flex-1 space-y-4 transition-all duration-300",
-                  showPreview ? "lg:max-w-[50%]" : "lg:max-w-full"
+                  showPreview ? "lg:max-w-[50%]" : "lg:max-w-full",
                 )}
               >
                 {/* Toggle preview button (desktop) */}
@@ -120,21 +115,18 @@ export function WidgetConfigCard({
                 </div>
 
                 {/* Config form */}
-                <div className="max-h-[500px] overflow-y-auto pr-2">
-                  {children}
-                </div>
+                <div className="max-h-[500px] overflow-y-auto pr-2">{children}</div>
 
                 {/* Generated URL */}
                 <div className="rounded-md bg-muted/30 p-3">
                   <p className="mb-2 text-xs font-medium text-muted-foreground">
                     OBS Browser Source URL
                   </p>
-                  <code className="block break-all text-xs text-foreground/80">
-                    {fullUrl}
-                  </code>
+                  <code className="block break-all text-xs text-foreground/80">{fullUrl}</code>
                   {recommendedSize && (
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Recommended size: <span className="font-mono text-foreground/80">{recommendedSize}</span>
+                      Recommended size:{" "}
+                      <span className="font-mono text-foreground/80">{recommendedSize}</span>
                     </p>
                   )}
                 </div>

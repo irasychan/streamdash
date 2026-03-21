@@ -13,12 +13,7 @@ type WidgetPreviewProps = {
   className?: string;
 };
 
-export function WidgetPreview({
-  url,
-  title,
-  aspect = "chat",
-  className,
-}: WidgetPreviewProps) {
+export function WidgetPreview({ url, title, aspect = "chat", className }: WidgetPreviewProps) {
   const [key, setKey] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -45,9 +40,7 @@ export function WidgetPreview({
     <div className={cn("flex flex-col", className)}>
       {/* Preview toolbar */}
       <div className="flex items-center justify-between border-b border-border/40 bg-muted/30 px-3 py-2">
-        <span className="text-xs font-medium text-muted-foreground">
-          Live Preview
-        </span>
+        <span className="text-xs font-medium text-muted-foreground">Live Preview</span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -87,7 +80,7 @@ export function WidgetPreview({
       <div
         className={cn(
           "widget-preview-bg relative overflow-hidden transition-all duration-300",
-          isExpanded ? "h-[500px]" : "h-auto"
+          isExpanded ? "h-[500px]" : "h-auto",
         )}
       >
         {/* Aspect ratio container (only when not expanded) */}
@@ -102,9 +95,7 @@ export function WidgetPreview({
             title={title}
             className={cn(
               "border-0 bg-transparent",
-              isExpanded
-                ? "h-full w-full"
-                : "absolute inset-0 h-full w-full"
+              isExpanded ? "h-full w-full" : "absolute inset-0 h-full w-full",
             )}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           />

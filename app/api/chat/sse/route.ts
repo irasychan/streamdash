@@ -33,12 +33,7 @@ export async function GET(request: Request) {
             controller.close();
           } catch (error) {
             // Stream controller may already be closed
-            console.error(
-              "Error closing SSE stream for client",
-              clientId,
-              "error:",
-              error,
-            );
+            console.error("Error closing SSE stream for client", clientId, "error:", error);
           }
         },
       };

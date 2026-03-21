@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   });
 
   const response = NextResponse.redirect(
-    `https://discord.com/api/oauth2/authorize?${params.toString()}`
+    `https://discord.com/api/oauth2/authorize?${params.toString()}`,
   );
   response.cookies.set("discord_oauth_state", state, {
     httpOnly: true,

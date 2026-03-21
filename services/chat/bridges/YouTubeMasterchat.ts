@@ -1,11 +1,6 @@
 import type { ChatMessage } from "@/features/chat/types/chat";
 import { getUsernameColor } from "@/lib/chat/usernameColor";
-import {
-  Masterchat,
-  MasterchatError,
-  stringify,
-  type AddChatItemAction,
-} from "masterchat";
+import { Masterchat, MasterchatError, stringify, type AddChatItemAction } from "masterchat";
 
 type MessageCallback = (message: ChatMessage) => void;
 type ErrorCallback = (error: YouTubeMasterchatError) => void;
@@ -87,7 +82,7 @@ export class YouTubeMasterchat {
       console.log(`[YouTubeMasterchat] Initializing for video: ${this.videoId}`);
       this.masterchat = await Masterchat.init(this.videoId);
       console.log(
-        `[YouTubeMasterchat] Connected to: ${this.masterchat.title} by ${this.masterchat.channelName}`
+        `[YouTubeMasterchat] Connected to: ${this.masterchat.title} by ${this.masterchat.channelName}`,
       );
 
       // Set up event handlers
@@ -127,11 +122,7 @@ export class YouTubeMasterchat {
       this.running = false;
 
       if (error instanceof MasterchatError) {
-        console.error(
-          "[YouTubeMasterchat] Init error:",
-          error.code,
-          error.message
-        );
+        console.error("[YouTubeMasterchat] Init error:", error.code, error.message);
         this.errorCallback?.({
           code: error.code,
           message: error.message || this.getErrorMessage(error.code),
@@ -183,9 +174,7 @@ export class YouTubeMasterchat {
     return {
       id: `youtube-${chat.id}`,
       platform: "youtube",
-      timestamp: chat.timestamp
-        ? new Date(chat.timestamp).getTime()
-        : Date.now(),
+      timestamp: chat.timestamp ? new Date(chat.timestamp).getTime() : Date.now(),
       author: {
         id: chat.authorChannelId,
         name: authorName,

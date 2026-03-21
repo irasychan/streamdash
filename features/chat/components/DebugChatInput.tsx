@@ -42,7 +42,7 @@ export function DebugChatInput({ onSend, onFlush }: DebugChatInputProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 border-t border-border/40 pt-3 mt-3"
+      className="mt-3 flex items-center gap-2 border-t border-border/40 pt-3"
     >
       <Bug className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
       <button
@@ -50,7 +50,7 @@ export function DebugChatInput({ onSend, onFlush }: DebugChatInputProps) {
         onClick={cyclePlatform}
         className={cn(
           config.color,
-          "shrink-0 rounded px-2 py-1 text-[10px] font-bold text-white transition-colors"
+          "shrink-0 rounded px-2 py-1 text-[10px] font-bold text-white transition-colors",
         )}
         title={`Sending as ${platform} (click to cycle)`}
       >
@@ -62,12 +62,12 @@ export function DebugChatInput({ onSend, onFlush }: DebugChatInputProps) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Send a debug message..."
-        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 outline-none"
+        className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/40"
       />
       <button
         type="submit"
         disabled={!text.trim()}
-        className="shrink-0 rounded px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+        className="shrink-0 rounded px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
       >
         Send
       </button>
@@ -75,7 +75,7 @@ export function DebugChatInput({ onSend, onFlush }: DebugChatInputProps) {
         <button
           type="button"
           onClick={onFlush}
-          className="shrink-0 rounded p-1 text-muted-foreground/40 hover:text-destructive transition-colors"
+          className="shrink-0 rounded p-1 text-muted-foreground/40 transition-colors hover:text-destructive"
           title="Clear debug messages"
         >
           <Trash2 className="h-3.5 w-3.5" />

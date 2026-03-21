@@ -118,9 +118,7 @@ export function DiscordChannelPicker({
       setLoadingChannels(true);
       setError("");
       try {
-        const response = await fetch(
-          `/api/discord/channels?guildId=${selectedGuildId}`
-        );
+        const response = await fetch(`/api/discord/channels?guildId=${selectedGuildId}`);
         const data = await response.json();
 
         if (data.rateLimited) {
@@ -199,9 +197,7 @@ export function DiscordChannelPicker({
 
   // Loading initial status
   if (!discordStatus) {
-    return (
-      <p className="text-sm text-muted-foreground">Checking Discord status...</p>
-    );
+    return <p className="text-sm text-muted-foreground">Checking Discord status...</p>;
   }
 
   return (
@@ -212,19 +208,13 @@ export function DiscordChannelPicker({
         </p>
       )}
 
-      {error && (
-        <p className="text-xs text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
-      {refreshing && (
-        <p className="text-xs text-muted-foreground">Refreshing session...</p>
-      )}
+      {refreshing && <p className="text-xs text-muted-foreground">Refreshing session...</p>}
 
       {/* Guild selector */}
       <div className="space-y-1">
-        <label className="text-xs font-medium text-muted-foreground">
-          Server
-        </label>
+        <label className="text-xs font-medium text-muted-foreground">Server</label>
         <select
           value={selectedGuildId}
           onChange={(e) => setSelectedGuildId(e.target.value)}
@@ -235,8 +225,8 @@ export function DiscordChannelPicker({
             {loadingGuilds
               ? "Loading servers..."
               : guilds.length === 0
-              ? "No servers found"
-              : "Select a server"}
+                ? "No servers found"
+                : "Select a server"}
           </option>
           {guilds.map((guild) => (
             <option key={guild.id} value={guild.id}>
@@ -249,9 +239,7 @@ export function DiscordChannelPicker({
       {/* Channel selector */}
       {selectedGuildId && (
         <div className="space-y-1">
-          <label className="text-xs font-medium text-muted-foreground">
-            Channel
-          </label>
+          <label className="text-xs font-medium text-muted-foreground">Channel</label>
           {loadingChannels ? (
             <p className="text-xs text-muted-foreground">Loading channels...</p>
           ) : channels.length === 0 ? (
@@ -264,17 +252,13 @@ export function DiscordChannelPicker({
                 <button
                   key={channel.id}
                   onClick={() => handleChannelSelect(channel)}
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-primary/10 transition-colors ${
-                    selectedChannelId === channel.id
-                      ? "bg-primary/20 text-primary"
-                      : ""
+                  className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-primary/10 ${
+                    selectedChannelId === channel.id ? "bg-primary/20 text-primary" : ""
                   }`}
                 >
                   <span className="text-muted-foreground">#</span> {channel.name}
                   {channel.category && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      ({channel.category})
-                    </span>
+                    <span className="ml-2 text-xs text-muted-foreground">({channel.category})</span>
                   )}
                 </button>
               ))}
@@ -289,8 +273,8 @@ export function DiscordChannelPicker({
           Enter channel ID manually
         </summary>
         <p className="mt-2 text-muted-foreground">
-          Enable Developer Mode in Discord settings, then right-click a channel
-          and select &quot;Copy Channel ID&quot;.
+          Enable Developer Mode in Discord settings, then right-click a channel and select
+          &quot;Copy Channel ID&quot;.
         </p>
       </details>
     </div>

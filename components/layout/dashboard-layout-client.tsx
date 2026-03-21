@@ -11,12 +11,8 @@ interface DashboardLayoutClientProps {
 }
 
 export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
-  const startChatStatusPolling = useAppStore(
-    (state) => state.startChatStatusPolling
-  );
-  const stopChatStatusPolling = useAppStore(
-    (state) => state.stopChatStatusPolling
-  );
+  const startChatStatusPolling = useAppStore((state) => state.startChatStatusPolling);
+  const stopChatStatusPolling = useAppStore((state) => state.stopChatStatusPolling);
 
   useEffect(() => {
     startChatStatusPolling();

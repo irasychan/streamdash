@@ -38,7 +38,7 @@ type EmoteRenderOptions = {
 export function highlightText(
   text: string,
   keywords: string[],
-  highlightMentions: boolean
+  highlightMentions: boolean,
 ): ReactNode {
   // Build combined regex parts
   const parts: string[] = [];
@@ -76,10 +76,7 @@ export function highlightText(
 
     if (isMention) {
       return (
-        <span
-          key={i}
-          className="text-primary font-semibold bg-primary/10 rounded px-0.5"
-        >
+        <span key={i} className="rounded bg-primary/10 px-0.5 font-semibold text-primary">
           {segment}
         </span>
       );
@@ -87,10 +84,7 @@ export function highlightText(
 
     if (isKeyword) {
       return (
-        <span
-          key={i}
-          className="text-accent font-semibold bg-accent/10 rounded px-0.5"
-        >
+        <span key={i} className="rounded bg-accent/10 px-0.5 font-semibold text-accent">
           {segment}
         </span>
       );
@@ -103,10 +97,7 @@ export function highlightText(
 /**
  * Split message content into text and emote segments based on emote positions
  */
-export function parseMessageSegments(
-  content: string,
-  emotes?: ChatEmote[]
-): MessageSegment[] {
+export function parseMessageSegments(content: string, emotes?: ChatEmote[]): MessageSegment[] {
   if (!emotes || emotes.length === 0) {
     return [{ type: "text", content }];
   }
@@ -145,7 +136,7 @@ export function parseMessageSegments(
  */
 export function parseThirdPartyEmotes(
   text: string,
-  emoteMap: Map<string, ThirdPartyEmote>
+  emoteMap: Map<string, ThirdPartyEmote>,
 ): MessageSegment[] {
   if (emoteMap.size === 0) {
     return [{ type: "text", content: text }];
@@ -182,7 +173,7 @@ export function renderMessageWithEmotes(
   emotes?: ChatEmote[],
   size: EmoteSizeClass = "medium",
   thirdPartyEmotes?: Map<string, ThirdPartyEmote>,
-  options: EmoteRenderOptions = {}
+  options: EmoteRenderOptions = {},
 ): ReactNode {
   const {
     showTwitchEmotes = true,
@@ -197,9 +188,7 @@ export function renderMessageWithEmotes(
   if (!showTwitchEmotes && !showThirdPartyEmotes) {
     return (
       <span>
-        {needsHighlight
-          ? highlightText(content, highlightKeywords, highlightMentions)
-          : content}
+        {needsHighlight ? highlightText(content, highlightKeywords, highlightMentions) : content}
       </span>
     );
   }

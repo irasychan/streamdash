@@ -17,10 +17,7 @@ export async function POST(request: Request) {
     const { messageId } = body;
 
     if (!messageId) {
-      return NextResponse.json(
-        { ok: false, error: "Missing message ID" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Missing message ID" }, { status: 400 });
     }
 
     connectionManager.hideMessage(messageId);
@@ -28,10 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[Chat Hide] Error:", error);
-    return NextResponse.json(
-      { ok: false, error: "Failed to hide message" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Failed to hide message" }, { status: 500 });
   }
 }
 
@@ -44,10 +38,7 @@ export async function DELETE(request: Request) {
     const { messageId } = body;
 
     if (!messageId) {
-      return NextResponse.json(
-        { ok: false, error: "Missing message ID" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Missing message ID" }, { status: 400 });
     }
 
     connectionManager.unhideMessage(messageId);
@@ -55,10 +46,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[Chat Unhide] Error:", error);
-    return NextResponse.json(
-      { ok: false, error: "Failed to unhide message" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Failed to unhide message" }, { status: 500 });
   }
 }
 

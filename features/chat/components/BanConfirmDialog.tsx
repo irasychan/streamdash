@@ -58,16 +58,13 @@ export function BanConfirmDialog({
             Ban {username}?
           </DialogTitle>
           <DialogDescription>
-            This will permanently ban the user from the channel. This action
-            cannot be undone from the dashboard.
+            This will permanently ban the user from the channel. This action cannot be undone from
+            the dashboard.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2">
-          <label
-            htmlFor="ban-reason"
-            className="text-sm font-medium text-muted-foreground"
-          >
+          <label htmlFor="ban-reason" className="text-sm font-medium text-muted-foreground">
             Reason (optional)
           </label>
 
@@ -78,7 +75,7 @@ export function BanConfirmDialog({
                 key={preset}
                 type="button"
                 onClick={() => handlePreset(preset)}
-                className="rounded-full border border-border/60 px-2.5 py-0.5 text-xs text-muted-foreground hover:border-border hover:text-foreground transition-colors"
+                className="rounded-full border border-border/60 px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
               >
                 {preset}
               </button>

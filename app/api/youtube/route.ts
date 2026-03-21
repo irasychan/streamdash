@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=statistics&${queryParam}&key=${apiKey}`,
-      { next: { revalidate: 30 } }
+      { next: { revalidate: 30 } },
     );
 
     const payload = await response.json();

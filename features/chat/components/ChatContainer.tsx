@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { ChatMessage as ChatMessageType, ChatModerationAction, ChatHideEvent, ChatPlatform } from "../types/chat";
+import type {
+  ChatMessage as ChatMessageType,
+  ChatModerationAction,
+  ChatHideEvent,
+  ChatPlatform,
+} from "../types/chat";
 import { ChatMessage, densityGapClasses } from "./ChatMessage";
 import { ChatActionBar } from "./ChatActionBar";
 import { BanConfirmDialog } from "./BanConfirmDialog";
@@ -28,9 +33,7 @@ export function ChatContainer({
   showDebugInput = false,
   className,
 }: ChatContainerProps) {
-  const [messages, setMessages] = useState<ChatMessageType[]>(
-    showDemo ? demoChatMessages : []
-  );
+  const [messages, setMessages] = useState<ChatMessageType[]>(showDemo ? demoChatMessages : []);
   const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
   const [moderatedUserIds, setModeratedUserIds] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
@@ -168,7 +171,7 @@ export function ChatContainer({
     async (
       message: ChatMessageType,
       action: ChatModerationAction,
-      opts?: { durationSeconds?: number; reason?: string }
+      opts?: { durationSeconds?: number; reason?: string },
     ) => {
       if (message.platform !== "twitch") return;
 
@@ -197,16 +200,17 @@ export function ChatContainer({
         }
 
         setModeratedUserIds((prev) => new Set([...prev, message.author.id]));
-        const actionLabel = action === "timeout"
-          ? `Timed out ${message.author.displayName}`
-          : `Banned ${message.author.displayName}`;
+        const actionLabel =
+          action === "timeout"
+            ? `Timed out ${message.author.displayName}`
+            : `Banned ${message.author.displayName}`;
         toast.success(actionLabel);
       } catch (error) {
         console.error("[Chat Moderation] Error:", error);
         toast.error("Moderation request failed");
       }
     },
-    [twitchChannel]
+    [twitchChannel],
   );
 
   const handleHide = useCallback(async (message: ChatMessageType) => {
@@ -266,16 +270,9 @@ export function ChatContainer({
   // --- Selection logic ---
 
   const selectedMessage = useMemo(
-    () => (selectedMessageId ? messages.find((m) => m.id === selectedMessageId) ?? null : null),
-    [selectedMessageId, messages]
+    () => (selectedMessageId ? (messages.find((m) => m.id === selectedMessageId) ?? null) : null),
+    [selectedMessageId, messages],
   );
-
-  // Auto-deselect if selected message leaves the array (maxMessages overflow)
-  useEffect(() => {
-    if (selectedMessageId && !messages.some((m) => m.id === selectedMessageId)) {
-      setSelectedMessageId(null);
-    }
-  }, [messages, selectedMessageId]);
 
   const handleSelectMessage = useCallback((msg: ChatMessageType) => {
     setSelectedMessageId((prev) => (prev === msg.id ? null : msg.id));
@@ -303,8 +300,8 @@ export function ChatContainer({
           if (!prev) {
             // Select first or last message
             return e.key === "ArrowDown"
-              ? messages[0]?.id ?? null
-              : messages[messages.length - 1]?.id ?? null;
+              ? (messages[0]?.id ?? null)
+              : (messages[messages.length - 1]?.id ?? null);
           }
           const idx = messages.findIndex((m) => m.id === prev);
           if (idx === -1) return null;
@@ -321,7 +318,7 @@ export function ChatContainer({
       if (e.key === "h" || e.key === "H") {
         e.preventDefault();
         setSelectedMessageId((prev) => {
-          const msg = prev ? messages.find((m) => m.id === prev) ?? null : null;
+          const msg = prev ? (messages.find((m) => m.id === prev) ?? null) : null;
           if (!msg) return prev;
           if (hiddenMessageIds.has(msg.id)) {
             handleUnhide(msg);
@@ -358,7 +355,15 @@ export function ChatContainer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [messages, selectedMessageId, hiddenMessageIds, twitchAuthConnected, handleHide, handleUnhide, handleModerate]);
+  }, [
+    messages,
+    selectedMessageId,
+    hiddenMessageIds,
+    twitchAuthConnected,
+    handleHide,
+    handleUnhide,
+    handleModerate,
+  ]);
 
   // Scroll selected message into view
   useEffect(() => {
@@ -374,7 +379,7 @@ export function ChatContainer({
       handleModerate(selectedMessage, "timeout", { durationSeconds: seconds });
       setSelectedMessageId(null);
     },
-    [selectedMessage, handleModerate]
+    [selectedMessage, handleModerate],
   );
 
   const handleBanClick = useCallback(() => {
@@ -391,7 +396,7 @@ export function ChatContainer({
       setBanTarget(null);
       setSelectedMessageId(null);
     },
-    [banTarget, handleModerate]
+    [banTarget, handleModerate],
   );
 
   const handleHideFromBar = useCallback(() => {
@@ -445,17 +450,17 @@ export function ChatContainer({
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
-      <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-3">
+      <div className="mb-3 flex items-center justify-between border-b border-border/40 pb-3">
         <div className="flex items-center gap-2.5">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Live Chat
           </span>
           <span
             className={cn(
               "h-2 w-2 rounded-full transition-all",
-              connected 
-                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" 
-                : "bg-muted-foreground/40"
+              connected
+                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                : "bg-muted-foreground/40",
             )}
             title={connected ? "Connected" : "Disconnected"}
           />
@@ -463,18 +468,12 @@ export function ChatContainer({
         <ConnectionStatus />
       </div>
 
-      <div
-        ref={containerRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto -mx-1 px-1"
-      >
+      <div ref={containerRef} onScroll={handleScroll} className="-mx-1 flex-1 overflow-y-auto px-1">
         {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
-              <div className="text-muted-foreground/60 text-sm">
-                {connected
-                  ? "Waiting for messages..."
-                  : "Connect to a platform to see chat"}
+              <div className="text-sm text-muted-foreground/60">
+                {connected ? "Waiting for messages..." : "Connect to a platform to see chat"}
               </div>
               {!connected && (
                 <div className="mt-2 text-xs text-muted-foreground/40">

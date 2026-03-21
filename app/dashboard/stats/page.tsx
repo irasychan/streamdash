@@ -21,7 +21,8 @@ export default function StatsPage() {
       try {
         // Use configured channel, fallback to demo
         const twitchChannel = config.platforms.twitch.defaultChannel || demoStats.channel;
-        const youtubeChannelId = config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
+        const youtubeChannelId =
+          config.platforms.youtube.defaultChannelId || demoStats.youtubeChannelId;
 
         const twitchResponse = await fetch("/api/twitch?channel=" + twitchChannel);
         const youtubeResponse = await fetch("/api/youtube?channelId=" + youtubeChannelId);
@@ -66,9 +67,7 @@ export default function StatsPage() {
         <h2 className="font-display text-2xl font-semibold">Statistics</h2>
         <p className="mt-1 text-muted-foreground">
           Track your streaming metrics across all platforms.
-          <span className="ml-2 text-xs text-muted-foreground/60">
-            {statusText}
-          </span>
+          <span className="ml-2 text-xs text-muted-foreground/60">{statusText}</span>
         </p>
       </div>
 

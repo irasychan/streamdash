@@ -12,12 +12,12 @@ export default function HomePage() {
             <Badge variant="secondary" className="bg-primary/15 text-foreground">
               Streaming Control Center
             </Badge>
-            <h1 className="mt-4 mb-3 font-display text-5xl">
+            <h1 className="mb-3 mt-4 font-display text-5xl">
               Dashboards and widgets for your stream universe.
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground">
-              This starter includes a dashboard view plus OBS-friendly widgets.
-              Wire in Twitch and YouTube credentials to replace the demo data.
+              This starter includes a dashboard view plus OBS-friendly widgets. Wire in Twitch and
+              YouTube credentials to replace the demo data.
             </p>
             <div className="hero-tags">
               <span className="pill">OBS overlays</span>

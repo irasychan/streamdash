@@ -31,11 +31,7 @@ const platformConfig: Record<
   },
 };
 
-export function PlatformBadge({
-  platform,
-  size = "sm",
-  className,
-}: PlatformBadgeProps) {
+export function PlatformBadge({ platform, size = "sm", className }: PlatformBadgeProps) {
   const config = platformConfig[platform];
 
   return (
@@ -45,7 +41,7 @@ export function PlatformBadge({
         config.bg,
         config.glow,
         size === "sm" ? "h-4 w-4 text-[10px]" : "h-6 w-6 text-xs",
-        className
+        className,
       )}
       title={config.label}
     >

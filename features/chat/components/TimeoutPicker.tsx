@@ -21,7 +21,7 @@ export function TimeoutPicker({ onTimeout }: TimeoutPickerProps) {
           variant="ghost"
           size="sm"
           onClick={() => onTimeout(preset.seconds)}
-          className="h-7 text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 px-2"
+          className="h-7 px-2 text-xs text-amber-400 hover:bg-amber-400/10 hover:text-amber-300"
         >
           {preset.label}
         </Button>

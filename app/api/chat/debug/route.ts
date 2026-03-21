@@ -42,7 +42,7 @@ export async function DELETE() {
     console.error("[Chat Debug] Flush error:", error);
     return NextResponse.json(
       { ok: false, error: "Failed to flush debug messages" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -59,14 +59,14 @@ export async function POST(request: Request) {
     if (!platform || !VALID_PLATFORMS.includes(platform)) {
       return NextResponse.json(
         { ok: false, error: "Invalid platform. Must be twitch, youtube, or discord." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!content || typeof content !== "string" || !content.trim()) {
       return NextResponse.json(
         { ok: false, error: "Missing or empty message content." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,9 +91,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, data: { id: message.id } });
   } catch (error) {
     console.error("[Chat Debug] Error:", error);
-    return NextResponse.json(
-      { ok: false, error: "Failed to send debug message" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Failed to send debug message" }, { status: 500 });
   }
 }

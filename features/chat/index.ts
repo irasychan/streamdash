@@ -13,7 +13,11 @@ export { DiscordBridge } from "@/services/chat/bridges/DiscordBridge";
 export { useChatStatus } from "./hooks/useChatStatus";
 
 // Utils
-export { renderMessageWithEmotes, parseMessageSegments, parseThirdPartyEmotes } from "./utils/emoteRenderer";
+export {
+  renderMessageWithEmotes,
+  parseMessageSegments,
+  parseThirdPartyEmotes,
+} from "./utils/emoteRenderer";
 
 // UI Components
 export { ChatContainer, ChatMessage, ConnectionStatus, PlatformBadge } from "./components";

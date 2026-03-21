@@ -66,9 +66,7 @@ export async function GET() {
       data: guilds.map((g) => ({
         id: g.id,
         name: g.name,
-        icon: g.icon
-          ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`
-          : null,
+        icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
         owner: g.owner,
       })),
     });

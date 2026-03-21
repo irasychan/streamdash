@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   });
 
   const response = NextResponse.redirect(
-    `https://id.twitch.tv/oauth2/authorize?${params.toString()}`
+    `https://id.twitch.tv/oauth2/authorize?${params.toString()}`,
   );
   response.cookies.set("twitch_oauth_state", state, {
     httpOnly: true,

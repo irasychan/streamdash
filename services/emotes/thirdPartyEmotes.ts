@@ -2,18 +2,15 @@ import type { EmoteSource, ThirdPartyEmote } from "@/features/emotes/types/emote
 
 // BTTV API
 const BTTV_GLOBAL_URL = "https://api.betterttv.net/3/cached/emotes/global";
-const BTTV_CHANNEL_URL = (id: string) =>
-  `https://api.betterttv.net/3/cached/users/twitch/${id}`;
+const BTTV_CHANNEL_URL = (id: string) => `https://api.betterttv.net/3/cached/users/twitch/${id}`;
 
 // FFZ API
 const FFZ_GLOBAL_URL = "https://api.frankerfacez.com/v1/set/global";
-const FFZ_CHANNEL_URL = (id: string) =>
-  `https://api.frankerfacez.com/v1/room/id/${id}`;
+const FFZ_CHANNEL_URL = (id: string) => `https://api.frankerfacez.com/v1/room/id/${id}`;
 
 // 7TV API
 const SEVENTV_GLOBAL_URL = "https://7tv.io/v3/emote-sets/global";
-const SEVENTV_CHANNEL_URL = (id: string) =>
-  `https://7tv.io/v3/users/twitch/${id}`;
+const SEVENTV_CHANNEL_URL = (id: string) => `https://7tv.io/v3/users/twitch/${id}`;
 
 async function fetchBTTVGlobal(): Promise<ThirdPartyEmote[]> {
   try {
@@ -139,9 +136,8 @@ async function fetch7TVGlobal(): Promise<ThirdPartyEmote[]> {
 
     for (const emote of data.emotes || []) {
       const file =
-        emote.data?.host?.files?.find(
-          (f: { name: string }) => f.name === "2x.webp"
-        ) || emote.data?.host?.files?.[0];
+        emote.data?.host?.files?.find((f: { name: string }) => f.name === "2x.webp") ||
+        emote.data?.host?.files?.[0];
       if (!file || !emote.data?.host?.url) continue;
 
       emotes.push({
@@ -171,9 +167,8 @@ async function fetch7TVChannel(channelId: string): Promise<ThirdPartyEmote[]> {
     if (emoteSet?.emotes) {
       for (const emote of emoteSet.emotes) {
         const file =
-          emote.data?.host?.files?.find(
-            (f: { name: string }) => f.name === "2x.webp"
-          ) || emote.data?.host?.files?.[0];
+          emote.data?.host?.files?.find((f: { name: string }) => f.name === "2x.webp") ||
+          emote.data?.host?.files?.[0];
         if (!file || !emote.data?.host?.url) continue;
 
         emotes.push({
@@ -192,9 +187,7 @@ async function fetch7TVChannel(channelId: string): Promise<ThirdPartyEmote[]> {
   }
 }
 
-export async function fetchThirdPartyEmotes(
-  twitchUserId: string
-): Promise<ThirdPartyEmote[]> {
+export async function fetchThirdPartyEmotes(twitchUserId: string): Promise<ThirdPartyEmote[]> {
   const results = await Promise.all([
     fetchBTTVGlobal(),
     fetchBTTVChannel(twitchUserId),

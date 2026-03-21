@@ -20,10 +20,7 @@ export async function POST(request: Request) {
 
     const validPlatforms = ["twitch", "youtube", "discord"] as const;
     if (!platform || !validPlatforms.includes(platform)) {
-      return NextResponse.json(
-        { ok: false, error: "Invalid platform" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Invalid platform" }, { status: 400 });
     }
 
     switch (platform) {
@@ -31,7 +28,7 @@ export async function POST(request: Request) {
         if (!channel) {
           return NextResponse.json(
             { ok: false, error: "Channel is required for Twitch" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -52,7 +49,7 @@ export async function POST(request: Request) {
         if (!videoId) {
           return NextResponse.json(
             { ok: false, error: "videoId is required for YouTube" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -77,14 +74,14 @@ export async function POST(request: Request) {
         if (!channelId) {
           return NextResponse.json(
             { ok: false, error: "channelId is required for Discord" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         if (!process.env.DISCORD_BOT_TOKEN) {
           return NextResponse.json(
             { ok: false, error: "Discord bot not configured" },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -99,10 +96,7 @@ export async function POST(request: Request) {
       default: {
         // TypeScript exhaustiveness check - should never reach here
         const _exhaustive: never = platform;
-        return NextResponse.json(
-          { ok: false, error: "Invalid platform" },
-          { status: 400 }
-        );
+        return NextResponse.json({ ok: false, error: "Invalid platform" }, { status: 400 });
       }
     }
   } catch (error) {
@@ -113,13 +107,10 @@ export async function POST(request: Request) {
     if (youtubeError) {
       return NextResponse.json(
         { ok: false, error: youtubeError.message, code: youtubeError.code },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json(
-      { ok: false, error: "Failed to connect" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Failed to connect" }, { status: 500 });
   }
 }
