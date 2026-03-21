@@ -49,12 +49,12 @@ See the [Wiki](https://github.com/irasychan/streamdash/wiki) for detailed docs:
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
-| `npm start` | Run production server |
-| `npm run lint` | ESLint check |
+| Command         | Description           |
+| --------------- | --------------------- |
+| `npm run dev`   | Start dev server      |
+| `npm run build` | Production build      |
+| `npm start`     | Run production server |
+| `npm run lint`  | ESLint check          |
 
 ## Credits
 

@@ -10,13 +10,13 @@
 - [ ] Hidden messages summary counter (step 6 of [chat-ux-redesign.md](docs/chat-ux-redesign.md) — collapsible "N messages hidden" in chat header)
 - [ ] TimeoutPicker "Custom..." duration input (design spec'd in chat-ux-redesign.md but only 1m/10m/1h presets implemented)
 
----
+______________________________________________________________________
 
 ## Bugs
 
 (See `worklogs/bugs.md` for active, deferred, and fixed bugs.)
 
----
+______________________________________________________________________
 
 ## Planned Tasks
 
@@ -72,7 +72,7 @@
 - [ ] Stream session summaries
 - [ ] Export data to CSV/JSON
 
----
+______________________________________________________________________
 
 ## Notes
 
@@ -84,11 +84,11 @@
 - Clicking toggles showing/hiding those messages in the feed
 - Components: `ChatContainer.tsx` (state), chat header area
 
----
+______________________________________________________________________
 
 _See `worklogs/roadmap.md` for full roadmap and icebox items._
 
----
+______________________________________________________________________
 
 ## Archive
 

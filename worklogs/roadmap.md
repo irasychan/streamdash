@@ -4,7 +4,7 @@
 
 A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-ready widgets and unified chat aggregation.
 
----
+______________________________________________________________________
 
 ## Phase 1: Core Dashboard (Completed)
 
@@ -143,7 +143,7 @@ A Next.js 16 streaming dashboard displaying Twitch/YouTube metrics with OBS-read
 - [ ] Deployment target + persistent storage strategy
 - [ ] Secrets management for hosted environments
 
----
+______________________________________________________________________
 
 ## Tech Stack
 
@@ -167,7 +167,7 @@ DISCORD_CLIENT_SECRET=
 DISCORD_BOT_TOKEN=          # Needs MESSAGE_CONTENT intent
 ```
 
----
+______________________________________________________________________
 
 ## Current Focus
 

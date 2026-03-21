@@ -31,22 +31,22 @@ Client Component → fetch("/api/...") → API Route → External API → JSON �
 
 ## Boundaries
 
-| Layer | Owns | Does NOT touch |
-|-------|------|----------------|
-| `app/` | Routing, page composition | Business logic, API calls |
-| `features/` | Feature UI, hooks, types | Other features directly |
-| `services/` | External API clients | React, UI |
-| `state/` | Global state, selectors | UI |
-| `components/` | Shared UI primitives | Feature-specific logic |
-| `server/` | Server-only helpers | Client code |
+| Layer         | Owns                      | Does NOT touch            |
+| ------------- | ------------------------- | ------------------------- |
+| `app/`        | Routing, page composition | Business logic, API calls |
+| `features/`   | Feature UI, hooks, types  | Other features directly   |
+| `services/`   | External API clients      | React, UI                 |
+| `state/`      | Global state, selectors   | UI                        |
+| `components/` | Shared UI primitives      | Feature-specific logic    |
+| `server/`     | Server-only helpers       | Client code               |
 
 ## Authentication
 
 Twitch uses OAuth 2.0 with httpOnly cookies:
 
 1. `/api/twitch/auth` starts the flow
-2. `/api/twitch/callback` exchanges code for tokens
-3. Tokens stored in cookies, auto-refresh on expiry
+1. `/api/twitch/callback` exchanges code for tokens
+1. Tokens stored in cookies, auto-refresh on expiry
 
 ## Conventions
 

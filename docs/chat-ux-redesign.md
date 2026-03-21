@@ -8,13 +8,13 @@ Beyond layout, there's no keyboard shortcut for moderation actions (only arrow k
 
 ## Current Architecture
 
-| Component | Role | File |
-|---|---|---|
-| `ChatContainer` | State management, SSE, selection, keyboard nav | `features/chat/components/ChatContainer.tsx` |
-| `ChatMessage` | Render message with visual states | `features/chat/components/ChatMessage.tsx` |
-| `ChatActionBar` | Bottom bar with actions on selected message | `features/chat/components/ChatActionBar.tsx` |
-| `BanConfirmDialog` | Modal confirm for bans | `features/chat/components/BanConfirmDialog.tsx` |
-| `ConnectionStatus` | Platform connection badges | `features/chat/components/ConnectionStatus.tsx` |
+| Component          | Role                                           | File                                            |
+| ------------------ | ---------------------------------------------- | ----------------------------------------------- |
+| `ChatContainer`    | State management, SSE, selection, keyboard nav | `features/chat/components/ChatContainer.tsx`    |
+| `ChatMessage`      | Render message with visual states              | `features/chat/components/ChatMessage.tsx`      |
+| `ChatActionBar`    | Bottom bar with actions on selected message    | `features/chat/components/ChatActionBar.tsx`    |
+| `BanConfirmDialog` | Modal confirm for bans                         | `features/chat/components/BanConfirmDialog.tsx` |
+| `ConnectionStatus` | Platform connection badges                     | `features/chat/components/ConnectionStatus.tsx` |
 
 ### Bimodal Design (preserve)
 
@@ -23,14 +23,14 @@ Beyond layout, there's no keyboard shortcut for moderation actions (only arrow k
 
 ### Visual States (preserve)
 
-| State | Style |
-|---|---|
-| Normal | Full opacity |
-| Highlighted | Gold tint + ring (`bg-primary/15 ring-primary/30`) |
-| Moderator msg | Green tint (`bg-emerald-500/[0.06]`) |
-| Hidden | Grey dim (`opacity-40 bg-slate-500/5 ring-slate-500/20`) |
-| Moderated user | Rose dim (`opacity-40 bg-rose-500/5 ring-rose-500/20`) |
-| Selected | Gold ring (`ring-2 ring-primary/60 bg-primary/10`) |
+| State          | Style                                                    |
+| -------------- | -------------------------------------------------------- |
+| Normal         | Full opacity                                             |
+| Highlighted    | Gold tint + ring (`bg-primary/15 ring-primary/30`)       |
+| Moderator msg  | Green tint (`bg-emerald-500/[0.06]`)                     |
+| Hidden         | Grey dim (`opacity-40 bg-slate-500/5 ring-slate-500/20`) |
+| Moderated user | Rose dim (`opacity-40 bg-rose-500/5 ring-rose-500/20`)   |
+| Selected       | Gold ring (`ring-2 ring-primary/60 bg-primary/10`)       |
 
 ## Proposed Changes
 
@@ -38,7 +38,7 @@ Beyond layout, there's no keyboard shortcut for moderation actions (only arrow k
 
 Split the single cramped row into a structured layout:
 
-```
+```txt
 Row 1: [Platform Badge] [Username]              [Hide/Unhide] [X Close]
 Row 2: [Timeout 1m] [10m] [1h] [Ban]   [keyboard hints: H hide | T timeout | B ban | Esc deselect]
 ```
@@ -51,19 +51,20 @@ Row 2: [Timeout 1m] [10m] [1h] [Ban]   [keyboard hints: H hide | T timeout | B b
 
 Add single-key shortcuts when a message is selected (skip if focus is in input/textarea):
 
-| Key | Action |
-|---|---|
-| `H` | Toggle hide/unhide |
-| `T` | Quick timeout (default 10min), or opens duration picker |
-| `B` | Open ban confirmation dialog |
-| `Esc` | Deselect |
-| `Up/Down` | Navigate messages |
+| Key       | Action                                                  |
+| --------- | ------------------------------------------------------- |
+| `H`       | Toggle hide/unhide                                      |
+| `T`       | Quick timeout (default 10min), or opens duration picker |
+| `B`       | Open ban confirmation dialog                            |
+| `Esc`     | Deselect                                                |
+| `Up/Down` | Navigate messages                                       |
 
 Implementation: extend the existing `keydown` handler in `ChatContainer`.
 
 ### 3. Platform-Aware Action Bar
 
 When selecting a YouTube or Discord message:
+
 - Show Hide/Unhide (works for all platforms)
 - Replace moderation section with subtle disabled state: "Moderation available for Twitch only"
 - Avoid hiding the entire row (confusing), instead show the limitation clearly
@@ -71,6 +72,7 @@ When selecting a YouTube or Discord message:
 ### 4. Enhanced Timeout UX
 
 Replace the dropdown with inline preset buttons:
+
 - `[1m] [10m] [1h] [Custom...]`
 - "Custom..." opens a small popover with a numeric input + unit selector
 - Each button triggers immediately (like current dropdown items)
@@ -84,22 +86,23 @@ Replace the dropdown with inline preset buttons:
 ### 6. Hidden Messages Summary
 
 Add a collapsible counter in the header area:
+
 - `"3 messages hidden"` — click to toggle showing/hiding them in the feed
 - Useful for streamers who want to review what was hidden
 
 ## Components to Modify
 
-| Component | Changes |
-|---|---|
-| `ChatActionBar` | Restructure to two rows, add platform gating text |
-| `ChatContainer` | Add keyboard handlers for H/T/B, add hidden message count |
-| `ChatMessage` | No changes needed (visual states already complete) |
-| `BanConfirmDialog` | Add reason presets, character counter |
+| Component          | Changes                                                   |
+| ------------------ | --------------------------------------------------------- |
+| `ChatActionBar`    | Restructure to two rows, add platform gating text         |
+| `ChatContainer`    | Add keyboard handlers for H/T/B, add hidden message count |
+| `ChatMessage`      | No changes needed (visual states already complete)        |
+| `BanConfirmDialog` | Add reason presets, character counter                     |
 
 ## Components to Create
 
-| Component | Purpose |
-|---|---|
+| Component       | Purpose                                         |
+| --------------- | ----------------------------------------------- |
 | `TimeoutPicker` | Inline preset buttons + custom duration popover |
 
 ## Preferences to Add (future)
@@ -117,8 +120,8 @@ Add a collapsible counter in the header area:
 ## Implementation Order
 
 1. Two-row action bar layout (visual only, no new behavior)
-2. Keyboard shortcuts (H/T/B) in ChatContainer
-3. Inline timeout preset buttons (replace dropdown)
-4. Platform-aware disabled state for non-Twitch messages
-5. Ban dialog improvements (reason presets)
-6. Hidden messages summary counter
+1. Keyboard shortcuts (H/T/B) in ChatContainer
+1. Inline timeout preset buttons (replace dropdown)
+1. Platform-aware disabled state for non-Twitch messages
+1. Ban dialog improvements (reason presets)
+1. Hidden messages summary counter

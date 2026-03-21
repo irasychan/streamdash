@@ -23,22 +23,22 @@ Hybrid approach: Twitch EventSub WebSocket for real-time events + slow polling f
 
 ## EventSub Events (Real-time)
 
-| Event | Description | Use Case |
-|-------|-------------|----------|
-| `channel.follow` | New follower | Alerts, counter increment |
-| `channel.subscribe` | New subscription | Alerts |
-| `channel.subscription.gift` | Gift subs | Alerts |
-| `channel.cheer` | Bits donation | Alerts |
-| `channel.raid` | Incoming raid | Alerts |
-| `stream.online` | Stream went live | Status update |
-| `stream.offline` | Stream ended | Status update |
+| Event                       | Description      | Use Case                  |
+| --------------------------- | ---------------- | ------------------------- |
+| `channel.follow`            | New follower     | Alerts, counter increment |
+| `channel.subscribe`         | New subscription | Alerts                    |
+| `channel.subscription.gift` | Gift subs        | Alerts                    |
+| `channel.cheer`             | Bits donation    | Alerts                    |
+| `channel.raid`              | Incoming raid    | Alerts                    |
+| `stream.online`             | Stream went live | Status update             |
+| `stream.offline`            | Stream ended     | Status update             |
 
 ## Polled Data (~60s interval)
 
-| Endpoint | Data | Why Polling |
-|----------|------|-------------|
-| `/helix/streams` | Viewer count, stream title | No real-time event available |
-| `/helix/channels/followers` | Total follower count | EventSub only sends individual events |
+| Endpoint                    | Data                       | Why Polling                           |
+| --------------------------- | -------------------------- | ------------------------------------- |
+| `/helix/streams`            | Viewer count, stream title | No real-time event available          |
+| `/helix/channels/followers` | Total follower count       | EventSub only sends individual events |
 
 ## SSE Event Format
 
